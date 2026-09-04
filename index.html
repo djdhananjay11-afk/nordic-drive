@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BilKompass Norge | Sammenlign bilmodeller</title>
+    <meta
+      name="description"
+      content="Sammenlign bilmodeller for norske forhold med pris, rekkevidde, bagasjeplass, hengerfeste og månedskostnad."
+    >
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="BilKompass Norge">
+        <span class="brand-mark">BK</span>
+        <span>
+          <strong>BilKompass</strong>
+          <small>Norge</small>
+        </span>
+      </a>
+      <nav aria-label="Hovednavigasjon">
+        <a href="#modeller">Modeller</a>
+        <a href="#sammenlign">Sammenlign</a>
+        <a href="#kostnad">Kostnad</a>
+        <a href="#guide">Guide</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Norsk bilvalg, uten støy</p>
+          <h1>Sammenlign elbiler, hybrider og familiebiler for norske veier.</h1>
+          <p>
+            Filtrer etter rekkevidde, pris, firehjulstrekk, hengerfeste og plass.
+            Velg inntil tre modeller og se dem side om side.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#modeller">Utforsk modeller</a>
+            <a class="button secondary" href="#sammenlign">Se sammenligning</a>
+          </div>
+        </div>
+        <div class="real-car-stage" aria-label="Bilder av biler på norske veier">
+          <figure class="hero-car hero-car-main">
+            <img
+              src="https://images.unsplash.com/photo-1617704548623-340376564e68?auto=format&fit=crop&w=900&q=82"
+              alt="Elektrisk SUV på vei"
+            >
+          </figure>
+          <figure class="hero-car hero-car-side">
+            <img
+              src="https://images.unsplash.com/photo-1609521263047-f8f205293f24?auto=format&fit=crop&w=700&q=82"
+              alt="Moderne elbil sett forfra"
+            >
+          </figure>
+          <figure class="hero-car hero-car-small">
+            <img
+              src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=620&q=82"
+              alt="Familiebil på vei"
+            >
+          </figure>
+        </div>
+        <div class="hero-panel" aria-label="Markedssammendrag">
+          <div>
+            <span class="metric-value" id="modelCount">0</span>
+            <span class="metric-label">modeller</span>
+          </div>
+          <div>
+            <span class="metric-value" id="brandCount">0</span>
+            <span class="metric-label">merker</span>
+          </div>
+          <div>
+            <span class="metric-value" id="bestTow">0 kg</span>
+            <span class="metric-label">beste hengervekt</span>
+          </div>
+          <div>
+            <span class="metric-value" id="bestRange">0 km</span>
+            <span class="metric-label">beste WLTP</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-band" id="modeller">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Finn riktig bil</p>
+            <h2>Modeller for norske behov</h2>
+          </div>
+          <p class="data-note" id="dbStatus">Laster lokal bil-database...</p>
+        </div>
+
+        <form class="filters" id="filters">
+          <label>
+            Søk
+            <input id="searchInput" type="search" placeholder="Volvo, Model Y, stasjonsvogn">
+          </label>
+          <label>
+            Drivlinje
+            <select id="fuelFilter">
+              <option value="all">Alle</option>
+              <option value="Elektrisk">Elektrisk</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Bensin">Bensin</option>
+            </select>
+          </label>
+          <label>
+            Merke
+            <select id="brandFilter">
+              <option value="all">Alle merker</option>
+            </select>
+          </label>
+          <label>
+            Karosseri
+            <select id="bodyFilter">
+              <option value="all">Alle</option>
+              <option value="SUV">SUV</option>
+              <option value="Kombi">Kombi</option>
+              <option value="Sedan">Sedan</option>
+              <option value="Stasjonsvogn">Stasjonsvogn</option>
+              <option value="Flerbruksbil">Flerbruksbil</option>
+              <option value="Pickup">Pickup</option>
+              <option value="Coupe">Coupe</option>
+            </select>
+          </label>
+          <label>
+            Makspris
+            <input id="priceRange" type="range" min="250000" max="2500000" step="25000" value="2500000">
+            <span id="priceOutput">2 500 000 kr</span>
+          </label>
+          <label class="check-row">
+            <input id="awdFilter" type="checkbox">
+            <span>Firehjulstrekk</span>
+          </label>
+          <label class="check-row">
+            <input id="towFilter" type="checkbox">
+            <span>Min. 1 200 kg hengervekt</span>
+          </label>
+          <label>
+            Sorter
+            <select id="sortSelect">
+              <option value="match">Beste match</option>
+              <option value="price">Lavest pris</option>
+              <option value="range">Lengst rekkevidde</option>
+              <option value="space">Mest bagasjeplass</option>
+              <option value="monthly">Lavest månedskostnad</option>
+              <option value="brand">Merke A-Å</option>
+            </select>
+          </label>
+        </form>
+
+        <div class="results-bar">
+          <strong id="resultCount">0 modeller</strong>
+          <span id="activeFilters">Alle modeller vises</span>
+        </div>
+
+        <div class="model-grid" id="modelGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="compare-band" id="sammenlign">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Side om side</p>
+            <h2>Din sammenligning</h2>
+          </div>
+          <button class="button secondary" id="clearCompare" type="button">Nullstill</button>
+        </div>
+        <div class="compare-empty" id="compareEmpty">
+          Velg opptil tre modeller fra listen for å fylle sammenligningen.
+        </div>
+        <div class="compare-table-wrap" id="compareWrap" hidden>
+          <table class="compare-table">
+            <thead id="compareHead"></thead>
+            <tbody id="compareBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="cost-band" id="kostnad">
+        <div class="cost-copy">
+          <p class="eyebrow">Eierskap i Norge</p>
+          <h2>Se mer enn listepris</h2>
+          <p>
+            Månedskostnaden estimerer finansiering, strøm eller drivstoff, forsikring,
+            service og dekk. Juster kjørelengde og egenkapital for å vurdere realistisk budsjett.
+          </p>
+        </div>
+        <div class="calculator">
+          <label>
+            Årlig kjørelengde
+            <input id="kmYear" type="range" min="8000" max="30000" step="1000" value="16000">
+            <span id="kmYearOut">16 000 km</span>
+          </label>
+          <label>
+            Egenkapital
+            <input id="downPayment" type="range" min="0" max="250000" step="10000" value="100000">
+            <span id="downPaymentOut">100 000 kr</span>
+          </label>
+          <label>
+            Valgt modell
+            <select id="calculatorModel"></select>
+          </label>
+          <div class="cost-result">
+            <span>Estimert månedskostnad</span>
+            <strong id="monthlyCost">0 kr</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="guide-band" id="guide">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Kjøpsguide</p>
+            <h2>Prioriteringer som betyr noe her hjemme</h2>
+          </div>
+        </div>
+        <div class="guide-grid">
+          <article>
+            <span>01</span>
+            <h3>Vinterrekkevidde</h3>
+            <p>Se etter varmepumpe, effektivt forbruk og lademulighet på hytta før du bare leser WLTP-tallet.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Henger og taklast</h3>
+            <p>Familieferier, sykkelstativ og små tilhengere skiller modellene mer enn motoreffekt gjør.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Plass i hverdagen</h3>
+            <p>Bagasjerom, baksetevinkel og frunk kan være viktigere enn utvendige centimeter.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Totaløkonomi</h3>
+            <p>Ta med finansiering, dekk, forsikring, service og verditap før du lander på “billigst”.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <strong>BilKompass Norge</strong>
+      <span>Uavhengig sammenligningsopplevelse med eksempeldata for demonstrasjon.</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

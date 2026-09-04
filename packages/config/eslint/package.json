@@ -1,0 +1,19 @@
+{
+  "name": "@nordicdrive/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.js",
+    "./next": "./next.js",
+    "./nestjs": "./nestjs.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.13.0",
+    "@next/eslint-plugin-next": "^15.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.11.0",
+    "@typescript-eslint/parser": "^8.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.11.0"
+  }
+}

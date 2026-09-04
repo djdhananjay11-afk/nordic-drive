@@ -1,0 +1,28 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tesla Model Y Long Range electric car artwork">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse"><stop stop-color="#f8fafc"/><stop offset="0.52" stop-color="#ffffff"/><stop offset="1" stop-color="#dbeafe"/></linearGradient>
+    <linearGradient id="paint" x1="145" y1="346" x2="1070" y2="620" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset="0.42" stop-color="#f8fafc"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>
+    <linearGradient id="glass" x1="302" y1="382" x2="953" y2="474" gradientUnits="userSpaceOnUse"><stop stop-color="#0f172a" stop-opacity="0.88"/><stop offset="1" stop-color="#64748b" stop-opacity="0.54"/></linearGradient>
+    <filter id="shadow" x="51" y="334" width="1099" height="337" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="38" stdDeviation="32" flood-color="#0f172a" flood-opacity="0.2"/></filter>
+  </defs>
+  <rect width="1200" height="800" rx="0" fill="url(#bg)"/>
+  <circle cx="972" cy="174" r="210" fill="#64748b" opacity="0.10"/>
+  <circle cx="204" cy="213" r="170" fill="#ffffff" opacity="0.62"/>
+  <path d="M132 652 C263 610 889 606 1077 652" stroke="#94a3b8" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
+  <g filter="url(#shadow)">
+    <path d="M122 515 C176 422 282 363 424 352 L765 352 C889 363 992 428 1053 514 L1085 521 C1107 527 1120 548 1113 573 L1104 603 L94 603 L86 566 C81 541 98 520 122 515 Z" fill="url(#paint)" stroke="#ffffff" stroke-width="5"/>
+    <path d="M403 382 L585 382 L653 473 L289 473 C310 429 349 396 403 382 Z M615 382 L779 384 C854 397 914 432 961 473 L688 473 Z" fill="url(#glass)" stroke="#ffffff" stroke-opacity="0.82" stroke-width="5"/>
+    <path d="M197 517 C290 500 873 499 1010 519" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity="0.95"/>
+    <path d="M151 553 L250 553" stroke="#64748b" stroke-width="10" stroke-linecap="round" opacity="0.72"/>
+    <path d="M966 553 L1064 553" stroke="#f43f5e" stroke-width="10" stroke-linecap="round" opacity="0.62"/>
+    <circle cx="296" cy="603" r="72" fill="#020617"/>
+    <circle cx="296" cy="603" r="43" fill="#e2e8f0"/>
+    <circle cx="296" cy="603" r="18" fill="#64748b"/>
+    <circle cx="901" cy="603" r="72" fill="#020617"/>
+    <circle cx="901" cy="603" r="43" fill="#e2e8f0"/>
+    <circle cx="901" cy="603" r="18" fill="#64748b"/>
+  </g>
+  <text x="72" y="100" fill="#475569" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" letter-spacing="7">TESLA</text>
+  <text x="72" y="156" fill="#020617" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700">Model Y Long Range</text>
+  <text x="72" y="203" fill="#64748b" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600">SUV / Electric / Norway</text>
+</svg>

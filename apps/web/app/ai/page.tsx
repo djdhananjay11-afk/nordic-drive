@@ -1,0 +1,15 @@
+import type { Metadata } from "next";
+
+import { AIAssistantView } from "@/features/ai/components/ai-assistant-view";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  description:
+    "Ask NordicDrive AI for electric car recommendations, semantic search, comparison summaries, and a Norway-focused EV buying quiz.",
+  path: "/ai",
+  title: "NordicDrive AI EV Recommendations",
+});
+
+export default function AIPage() {
+  return <AIAssistantView />;
+}
