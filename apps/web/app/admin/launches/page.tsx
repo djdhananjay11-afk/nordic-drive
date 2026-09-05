@@ -25,8 +25,10 @@ export default async function AdminLaunchesPage() {
       <AdminTable
         columns={["Model", "Brand", "Expected", "Estimate", "Confidence", "Status"]}
         rows={launches.map((launch) => [
-          <span className="font-semibold" key="model">{launch.modelName}</span>,
-          launch.brand.name,
+          <span className="font-semibold" key="model">
+            {launch.modelName}
+          </span>,
+          launch.brand?.name ?? "Unknown brand",
           launch.expectedLaunchDate?.toLocaleDateString("nb-NO") ?? "TBD",
           launch.estimatedPriceFromNok ? formatNok(launch.estimatedPriceFromNok) : "TBD",
           `${launch.confidenceLevel}%`,

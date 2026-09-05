@@ -24,9 +24,11 @@ export default async function AdminArticlesPage() {
       <AdminTable
         columns={["Title", "Category", "Author", "Published", "Status"]}
         rows={articles.map((article) => [
-          <span className="font-semibold" key="title">{article.title}</span>,
+          <span className="font-semibold" key="title">
+            {article.title}
+          </span>,
           article.category,
-          article.author.name ?? article.author.email,
+          article.author?.name ?? article.author?.email ?? "Unknown author",
           article.publishedAt?.toLocaleDateString("nb-NO") ?? "Not published",
           article.status,
         ])}

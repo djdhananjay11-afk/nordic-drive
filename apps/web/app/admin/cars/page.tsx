@@ -25,12 +25,17 @@ export default async function AdminCarsPage() {
       <AdminTable
         columns={["Model", "Brand", "Segment", "Price from", "Primary variant", "Status"]}
         rows={cars.map((car) => [
-          <span className="font-semibold" key="model">{car.name}</span>,
-          car.brand.name,
+          <span className="font-semibold" key="model">
+            {car.name}
+          </span>,
+          car.brand?.name ?? "Unknown brand",
           car.segment,
           car.priceFromNok ? formatNok(car.priceFromNok) : "Not set",
           car.variants[0]?.name ?? "No variants",
-          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold" key="status">
+          <span
+            className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold"
+            key="status"
+          >
             {car.status}
           </span>,
         ])}

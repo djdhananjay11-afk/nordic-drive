@@ -1,5 +1,22 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "AUTH_SECRET",
+    "AUTH_URL",
+    "DATABASE_URL",
+    "NEXT_PUBLIC_APP_URL",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_ENABLE_R3F_VIEWER",
+    "OPENAI_API_KEY",
+    "OPENAI_MODEL",
+    "OPENAI_EMBEDDING_MODEL",
+    "ALGOLIA_APP_ID",
+    "ALGOLIA_SEARCH_API_KEY",
+    "ALGOLIA_CARS_INDEX_NAME",
+    "VERCEL",
+    "VERCEL_URL",
+    "VERCEL_PROJECT_PRODUCTION_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "Admin",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   const session = await auth();
 

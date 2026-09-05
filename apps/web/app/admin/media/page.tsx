@@ -23,7 +23,9 @@ export default async function AdminMediaPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Upload image or 3D asset</h2>
-            <p className="mt-1 text-sm text-slate-500">Supported: JPG, PNG, WEBP, GLB, GLTF. Max 25 MB.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Supported: JPG, PNG, WEBP, GLB, GLTF. Max 25 MB.
+            </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <input className="text-sm" name="file" required type="file" />
@@ -37,9 +39,15 @@ export default async function AdminMediaPage() {
       <AdminTable
         columns={["Asset", "Type", "Linked to", "Primary", "Updated"]}
         rows={media.map((asset) => [
-          <span className="font-semibold" key="asset">{asset.altText ?? asset.title ?? asset.url}</span>,
+          <span className="font-semibold" key="asset">
+            {asset.altText ?? asset.title ?? asset.url}
+          </span>,
           asset.type,
-          asset.car?.name ?? asset.brand?.name ?? asset.article?.title ?? asset.launch?.modelName ?? "Unassigned",
+          asset.car?.name ??
+            asset.brand?.name ??
+            asset.article?.title ??
+            asset.launch?.modelName ??
+            "Unassigned",
           asset.isPrimary ? "Yes" : "No",
           asset.updatedAt.toLocaleDateString("nb-NO"),
         ])}
