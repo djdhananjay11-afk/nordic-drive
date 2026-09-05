@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const isProduction = process.env.NODE_ENV === "production";
+const isVercel = process.env.VERCEL === "1";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -18,7 +19,9 @@ const contentSecurityPolicy = [
 
 const nextConfig: NextConfig = {
   compress: true,
-  ...(process.env.NEXT_OUTPUT_STANDALONE === "false" ? {} : { output: "standalone" as const }),
+  ...(process.env.NEXT_OUTPUT_STANDALONE === "false" || isVercel
+    ? {}
+    : { output: "standalone" as const }),
   typedRoutes: true,
   transpilePackages: ["@nordicdrive/database", "@nordicdrive/types"],
   images: {

@@ -15,11 +15,24 @@ import {
 } from "@/lib/i18n/config";
 import { dictionaries } from "@/lib/i18n/dictionaries";
 
+function resolveSiteUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  const rawUrl = configuredUrl || (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000");
+  const urlWithProtocol = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
+
+  try {
+    return new URL(urlWithProtocol).origin;
+  } catch {
+    return "http://localhost:3000";
+  }
+}
+
 export const siteConfig = {
   name: "NordicDrive",
   description: dictionaries.en.metadata.siteDescription,
   locale: "en_NO",
-  url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  url: resolveSiteUrl(),
 };
 
 export function absoluteUrl(path = "/") {
