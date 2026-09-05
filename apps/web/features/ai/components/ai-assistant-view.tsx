@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { motion } from "framer-motion";
-import { ArrowRight, Bot, BrainCircuit, Check, Loader2, Search, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BrainCircuit,
+  Check,
+  Loader2,
+  MessageSquare,
+  Search,
+  Send,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/card";
+import { localizePath, type Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
 type Recommendation = {
@@ -47,19 +57,41 @@ type SearchResponse = {
   }>;
 };
 
+type ChatMessage = {
+  id: string;
+  role: "assistant" | "user";
+  content: string;
+  recommendation?: RecommendationResponse;
+};
+
 const examplePrompts = [
   "Best family EV under 600000 NOK with long range",
+  "Best offers under 4500 NOK per month",
+  "Cheapest EV with 450 km range",
   "Luxury SUV for winter trips and towing",
   "Fast charging EV for Oslo to Bergen weekends",
 ] as const;
 
 const defaultPrompt = examplePrompts[0];
 
+function createMessageId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 const quizQuestions = [
   {
     id: "budget",
     label: "Budget",
-    options: ["Under 500000 NOK", "Under 600000 NOK", "Under 850000 NOK", "Flexible premium budget"],
+    options: [
+      "Under 500000 NOK",
+      "Under 600000 NOK",
+      "Under 850000 NOK",
+      "Flexible premium budget",
+    ],
   },
   {
     id: "seats",
@@ -80,41 +112,103 @@ const quizQuestions = [
 
 type QuizAnswerKey = (typeof quizQuestions)[number]["id"];
 
-export function AIAssistantView() {
+export function AIAssistantView({ locale }: { locale: Locale }) {
   const [query, setQuery] = useState<string>(defaultPrompt);
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      content:
+        "Hi, I am NordicDrive AI. Tell me your budget, range need, family size, winter driving, or ask for the best offers. I will suggest the strongest EV matches in Norway.",
+      id: "welcome",
+      role: "assistant",
+    },
+  ]);
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResponse["results"]>([]);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [needsTowing, setNeedsTowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isQuizLoading, setIsQuizLoading] = useState(false);
+  const quickBudgetPrompts = useMemo(
+    () => [
+      "Best EV under 400000 NOK",
+      "Best family EV under 600000 NOK",
+      "Longest range under 700000 NOK",
+      "Best monthly offer under 5000 NOK",
+    ],
+    [],
+  );
+
+  async function fetchRecommendation(nextQuery: string) {
+    const [recommendationResponse, searchResponse] = await Promise.all([
+      fetch("/api/ai/recommendations", {
+        body: JSON.stringify({ query: nextQuery }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      }),
+      fetch("/api/ai/search", {
+        body: JSON.stringify({ query: nextQuery, limit: 4 }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      }),
+    ]);
+
+    let nextRecommendation: RecommendationResponse | null = null;
+
+    if (recommendationResponse.ok) {
+      nextRecommendation = (await recommendationResponse.json()) as RecommendationResponse;
+      setRecommendation(nextRecommendation);
+    }
+
+    if (searchResponse.ok) {
+      const payload = (await searchResponse.json()) as SearchResponse;
+      setSearchResults(payload.results);
+    }
+
+    return nextRecommendation;
+  }
 
   async function runRecommendation(nextQuery = query) {
     setIsLoading(true);
     setQuery(nextQuery);
 
     try {
-      const [recommendationResponse, searchResponse] = await Promise.all([
-        fetch("/api/ai/recommendations", {
-          body: JSON.stringify({ query: nextQuery }),
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-        }),
-        fetch("/api/ai/search", {
-          body: JSON.stringify({ query: nextQuery, limit: 4 }),
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-        }),
-      ]);
+      await fetchRecommendation(nextQuery);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-      if (recommendationResponse.ok) {
-        setRecommendation((await recommendationResponse.json()) as RecommendationResponse);
+  async function sendChatMessage(nextQuery = chatInput.trim()) {
+    if (nextQuery.length < 3 || isLoading) {
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      content: nextQuery,
+      id: createMessageId(),
+      role: "user",
+    };
+
+    setMessages((current) => [...current, userMessage]);
+    setChatInput("");
+    setIsLoading(true);
+
+    try {
+      const nextRecommendation = await fetchRecommendation(nextQuery);
+      const assistantMessage: ChatMessage = {
+        content:
+          nextRecommendation?.summary ??
+          "I could not generate a recommendation from that request. Try adding a budget, range, or body type.",
+        id: createMessageId(),
+        role: "assistant",
+      };
+
+      if (nextRecommendation) {
+        assistantMessage.recommendation = nextRecommendation;
       }
 
-      if (searchResponse.ok) {
-        const payload = (await searchResponse.json()) as SearchResponse;
-        setSearchResults(payload.results);
-      }
+      setMessages((current) => [...current, assistantMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +252,8 @@ export function AIAssistantView() {
               Ask for the EV you actually need.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-              Natural-language search, semantic vehicle matching, comparison summaries, and a Norway-focused EV quiz.
+              Natural-language search, semantic vehicle matching, comparison summaries, and a
+              Norway-focused EV quiz.
             </p>
           </div>
 
@@ -180,28 +275,60 @@ export function AIAssistantView() {
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1fr_0.86fr]">
           <GlassCard className="bg-white/80 p-4 shadow-sm md:p-6">
             <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
-              <Bot className="size-4" />
-              AI car recommendations
+              <MessageSquare className="size-4" />
+              Chat with NordicDrive AI
+            </div>
+            <div className="mt-5 max-h-[520px] space-y-4 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+              {messages.map((message) => (
+                <ChatBubble key={message.id} locale={locale} message={message} />
+              ))}
+              {isLoading ? (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm font-semibold text-slate-500 shadow-sm">
+                    <Loader2 className="mr-2 inline size-4 animate-spin" />
+                    Finding the best EV matches...
+                  </div>
+                </div>
+              ) : null}
             </div>
             <div className="mt-5 flex flex-col gap-3 md:flex-row">
               <input
                 className="h-12 flex-1 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-950"
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Best family EV under 600000 NOK with long range"
-                value={query}
+                onChange={(event) => setChatInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    void sendChatMessage();
+                  }
+                }}
+                placeholder="Ask about budget, range, best offers, family EVs..."
+                value={chatInput}
               />
               <Button
                 className="bg-slate-950 text-white hover:bg-slate-800"
-                disabled={isLoading || query.trim().length < 3}
-                onClick={() => runRecommendation()}
+                disabled={isLoading || chatInput.trim().length < 3}
+                onClick={() => sendChatMessage()}
                 size="xl"
                 type="button"
               >
-                {isLoading ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Search className="mr-2 size-4" />}
-                Ask AI
+                {isLoading ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 size-4" />
+                )}
+                Send
               </Button>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
+              {quickBudgetPrompts.map((prompt) => (
+                <button
+                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-950"
+                  key={prompt}
+                  onClick={() => sendChatMessage(prompt)}
+                  type="button"
+                >
+                  {prompt}
+                </button>
+              ))}
               {examplePrompts.map((prompt) => (
                 <button
                   className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-950 hover:bg-white"
@@ -214,7 +341,11 @@ export function AIAssistantView() {
               ))}
             </div>
 
-            {recommendation ? <RecommendationResults recommendation={recommendation} /> : <EmptyRecommendationState />}
+            {recommendation ? (
+              <RecommendationResults compact locale={locale} recommendation={recommendation} />
+            ) : (
+              <EmptyRecommendationState />
+            )}
           </GlassCard>
 
           <GlassCard className="bg-white/80 p-4 shadow-sm md:p-6">
@@ -225,7 +356,11 @@ export function AIAssistantView() {
             <div className="mt-5 space-y-3">
               {searchResults.length > 0 ? (
                 searchResults.map((result) => (
-                  <Link className="block" href={result.car.href as Route} key={result.car.key}>
+                  <Link
+                    className="block"
+                    href={localizePath(locale, result.car.href) as Route}
+                    key={result.car.key}
+                  >
                     <div className="rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-950 hover:bg-white">
                       <div className="flex items-start justify-between gap-4">
                         <div>
@@ -257,11 +392,24 @@ export function AIAssistantView() {
           <GlassCard className="bg-white/80 p-4 shadow-sm md:p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">EV recommendation quiz</p>
-                <h2 className="mt-2 text-3xl font-semibold">Find a short list in under a minute.</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  EV recommendation quiz
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold">
+                  Find a short list in under a minute.
+                </h2>
               </div>
-              <Button className="bg-slate-950 text-white hover:bg-slate-800" disabled={isQuizLoading} onClick={runQuiz} size="lg">
-                {isQuizLoading ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Sparkles className="mr-2 size-4" />}
+              <Button
+                className="bg-slate-950 text-white hover:bg-slate-800"
+                disabled={isQuizLoading}
+                onClick={runQuiz}
+                size="lg"
+              >
+                {isQuizLoading ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 size-4" />
+                )}
                 Generate picks
               </Button>
             </div>
@@ -270,7 +418,9 @@ export function AIAssistantView() {
               {quizQuestions.map((question) => (
                 <QuizQuestion
                   key={question.id}
-                  onSelect={(value) => setQuizAnswers((current) => ({ ...current, [question.id]: value }))}
+                  onSelect={(value) =>
+                    setQuizAnswers((current) => ({ ...current, [question.id]: value }))
+                  }
                   question={question}
                   selected={quizAnswers[question.id]}
                 />
@@ -278,7 +428,11 @@ export function AIAssistantView() {
             </div>
 
             <label className="mt-5 flex cursor-pointer items-center gap-3 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
-              <input checked={needsTowing} onChange={(event) => setNeedsTowing(event.target.checked)} type="checkbox" />
+              <input
+                checked={needsTowing}
+                onChange={(event) => setNeedsTowing(event.target.checked)}
+                type="checkbox"
+              />
               I need towing for cabin trips, trailer, or winter gear.
             </label>
           </GlassCard>
@@ -288,7 +442,61 @@ export function AIAssistantView() {
   );
 }
 
-function RecommendationResults({ recommendation }: { recommendation: RecommendationResponse }) {
+function ChatBubble({ locale, message }: { locale: Locale; message: ChatMessage }) {
+  const isUser = message.role === "user";
+
+  return (
+    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+      <div
+        className={cn(
+          "max-w-[92%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm",
+          isUser
+            ? "rounded-br-sm bg-slate-950 text-white"
+            : "rounded-bl-sm bg-white text-slate-700",
+        )}
+      >
+        <p className="font-medium">{message.content}</p>
+        {message.recommendation ? (
+          <div className="mt-4 grid gap-2">
+            {message.recommendation.recommendations.slice(0, 3).map((car, index) => (
+              <Link
+                className="block rounded-lg border border-slate-200 bg-slate-50 p-3 text-slate-950 transition hover:border-slate-950"
+                href={localizePath(locale, car.href) as Route}
+                key={car.key}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                      #{index + 1} / {car.brand}
+                    </div>
+                    <div className="mt-1 font-semibold">
+                      {car.model} - {Math.round(car.score)}% match
+                    </div>
+                  </div>
+                  <ArrowRight className="size-4 text-slate-400" />
+                </div>
+                <div className="mt-2 text-xs text-slate-500">
+                  {car.rangeWltpKm} km WLTP - {car.winterRangeKm} km winter -{" "}
+                  {car.priceNok.toLocaleString("nb-NO")} NOK
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function RecommendationResults({
+  compact = false,
+  locale,
+  recommendation,
+}: {
+  compact?: boolean;
+  locale: Locale;
+  recommendation: RecommendationResponse;
+}) {
   return (
     <motion.div animate={{ opacity: 1, y: 0 }} className="mt-6" initial={{ opacity: 0, y: 12 }}>
       <div className="rounded-md bg-slate-950 p-5 text-white">
@@ -298,16 +506,20 @@ function RecommendationResults({ recommendation }: { recommendation: Recommendat
         <p className="mt-3 text-lg font-semibold leading-7">{recommendation.summary}</p>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className={cn("mt-4 grid gap-4", compact ? "md:grid-cols-2" : "lg:grid-cols-2")}>
         {recommendation.recommendations.map((car, index) => (
-          <Link href={car.href as Route} key={car.key}>
+          <Link href={localizePath(locale, car.href) as Route} key={car.key}>
             <div className="h-full rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-slate-950">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">{car.brand}</div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    {car.brand}
+                  </div>
                   <h3 className="mt-1 text-2xl font-semibold">{car.model}</h3>
                 </div>
-                <div className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white">#{index + 1}</div>
+                <div className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white">
+                  #{index + 1}
+                </div>
               </div>
               <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
                 <motion.div
@@ -317,7 +529,9 @@ function RecommendationResults({ recommendation }: { recommendation: Recommendat
                   transition={{ duration: 0.8 }}
                 />
               </div>
-              <div className="mt-2 text-sm font-semibold text-slate-500">Match score {car.score}</div>
+              <div className="mt-2 text-sm font-semibold text-slate-500">
+                Match score {car.score}
+              </div>
               <div className="mt-5 grid gap-2 text-sm text-slate-600">
                 {car.reasons.map((reason) => (
                   <div className="flex gap-2" key={reason}>
@@ -361,13 +575,17 @@ function QuizQuestion({
 }) {
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-      <div className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">{question.label}</div>
+      <div className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+        {question.label}
+      </div>
       <div className="mt-4 space-y-2">
         {question.options.map((option) => (
           <button
             className={cn(
               "w-full rounded-md border px-3 py-2 text-left text-sm font-semibold transition",
-              selected === option ? "border-slate-950 bg-white text-slate-950" : "border-slate-200 bg-white/60 text-slate-600",
+              selected === option
+                ? "border-slate-950 bg-white text-slate-950"
+                : "border-slate-200 bg-white/60 text-slate-600",
             )}
             key={option}
             onClick={() => onSelect(option)}

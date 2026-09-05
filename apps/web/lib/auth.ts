@@ -6,8 +6,18 @@ import { prisma } from "@/lib/db";
 import { stripLocaleFromPathname } from "@/lib/i18n/config";
 import { isAdminRole, ROLE_PERMISSIONS } from "@/lib/rbac";
 
+const configuredAuthSecret =
+  process.env.AUTH_SECRET?.trim() || process.env.NEXTAUTH_SECRET?.trim() || undefined;
+
+const authSecret =
+  configuredAuthSecret ??
+  (process.env.NODE_ENV !== "production"
+    ? "nordicdrive-local-development-secret-change-before-production"
+    : undefined);
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  ...(authSecret ? { secret: authSecret } : {}),
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 7,

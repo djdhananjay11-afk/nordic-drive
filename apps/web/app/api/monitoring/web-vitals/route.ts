@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const webVitalsSchema = z.object({
   id: z.string().min(1).max(120),
-  name: z.enum(["CLS", "FCP", "FID", "INP", "LCP", "TTFB"]),
+  name: z.string().min(1).max(120),
   rating: z.enum(["good", "needs-improvement", "poor"]).optional(),
   startTime: z.number().finite().nonnegative(),
   value: z.number().finite().nonnegative(),

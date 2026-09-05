@@ -12,7 +12,7 @@ type InformationalPageProps = {
   description: string;
   eyebrow: string;
   locale: Locale;
-  sections: Array<{
+  sections: ReadonlyArray<{
     body: string;
     title: string;
   }>;

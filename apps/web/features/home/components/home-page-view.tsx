@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { Route } from "next";
-import type { ComponentType, ReactNode } from "react";
+import { useMemo, useState, type ComponentType, type ReactNode } from "react";
 import {
   ArrowRight,
   BatteryCharging,
@@ -26,6 +26,7 @@ import { localizePath, type Locale } from "@/lib/i18n/config";
 import type { HomeDictionary } from "@/lib/i18n/dictionaries";
 import { HomeSearch } from "./home-search";
 import { InteractiveVehicle } from "./interactive-vehicle";
+import { cn } from "@/lib/utils";
 
 type HomePageViewProps = {
   copy: HomeDictionary;
@@ -52,6 +53,14 @@ export function HomePageView({
   locale,
 }: HomePageViewProps) {
   const { scrollYProgress } = useScroll();
+  const heroCars = useMemo(() => featuredCars.slice(0, 4), [featuredCars]);
+  const [selectedHeroCarKey, setSelectedHeroCarKey] = useState(
+    `${heroCars[0]?.brandSlug ?? "tesla"}-${heroCars[0]?.modelSlug ?? "model-y-long-range"}`,
+  );
+  const selectedHeroCar =
+    heroCars.find((car) => `${car.brandSlug}-${car.modelSlug}` === selectedHeroCarKey) ??
+    heroCars[0] ??
+    featuredCars[0];
   const heroY = useTransform(scrollYProgress, [0, 0.22], [0, 120]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.38]);
 
@@ -114,7 +123,29 @@ export function HomePageView({
         </motion.div>
 
         <div className="relative z-10 w-full">
-          <InteractiveVehicle className="mt-6" />
+          {selectedHeroCar ? <InteractiveVehicle car={selectedHeroCar} className="mt-6" /> : null}
+          <div className="mx-auto mt-4 flex max-w-4xl flex-wrap items-center justify-center gap-2">
+            {heroCars.map((car) => {
+              const carKey = `${car.brandSlug}-${car.modelSlug}`;
+              const isSelected = selectedHeroCarKey === carKey;
+
+              return (
+                <button
+                  className={cn(
+                    "rounded-full border px-4 py-2 text-xs font-semibold transition",
+                    isSelected
+                      ? "border-slate-950 bg-slate-950 text-white"
+                      : "border-white/70 bg-white/60 text-slate-700 shadow-sm backdrop-blur hover:bg-white",
+                  )}
+                  key={carKey}
+                  onClick={() => setSelectedHeroCarKey(carKey)}
+                  type="button"
+                >
+                  {car.brand} {car.model}
+                </button>
+              );
+            })}
+          </div>
           <HomeSearch cars={featuredCars} copy={copy.search} locale={locale} />
           <div className="mx-auto mt-4 flex max-w-4xl flex-col items-center justify-center gap-2 rounded-xl border border-white/70 bg-white/55 px-4 py-3 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur md:flex-row md:gap-4">
             <span>{copy.trust.disclaimer}</span>

@@ -30,7 +30,9 @@ export async function recommendVehicles(query: string, limit = 4): Promise<AIRec
   const intent = await parseSearchIntent(query);
   const semanticResults = await semanticVehicleSearch(query, 8);
   const documents = getVehicleDocuments();
-  const semanticScoreByKey = new Map(semanticResults.map((result) => [result.document.id, result.score]));
+  const semanticScoreByKey = new Map(
+    semanticResults.map((result) => [result.document.id, result.score]),
+  );
 
   const recommendations = documents
     .map((document) => {
@@ -38,7 +40,10 @@ export async function recommendVehicles(query: string, limit = 4): Promise<AIRec
       const constraintPenalty = getConstraintPenalty(intent, car);
       const preferenceScore = getPreferenceScore(intent, car);
       const semanticScore = semanticScoreByKey.get(document.id) ?? 0;
-      const score = Math.max(0, Math.min(100, Math.round(semanticScore * 34 + preferenceScore - constraintPenalty)));
+      const score = Math.max(
+        0,
+        Math.min(100, Math.round(semanticScore * 34 + preferenceScore - constraintPenalty)),
+      );
 
       return {
         brand: car.brand,
@@ -78,7 +83,10 @@ export async function recommendVehicles(query: string, limit = 4): Promise<AIRec
   };
 }
 
-function getConstraintPenalty(intent: SearchIntent, car: ReturnType<typeof getVehicleDocuments>[number]["car"]) {
+function getConstraintPenalty(
+  intent: SearchIntent,
+  car: ReturnType<typeof getVehicleDocuments>[number]["car"],
+) {
   let penalty = 0;
 
   if (intent.budgetMaxNok && car.priceNok > intent.budgetMaxNok) penalty += 34;
@@ -89,16 +97,23 @@ function getConstraintPenalty(intent: SearchIntent, car: ReturnType<typeof getVe
   return penalty;
 }
 
-function getPreferenceScore(intent: SearchIntent, car: ReturnType<typeof getVehicleDocuments>[number]["car"]) {
+function getPreferenceScore(
+  intent: SearchIntent,
+  car: ReturnType<typeof getVehicleDocuments>[number]["car"],
+) {
   let score = 42;
 
   if (intent.budgetMaxNok && car.priceNok <= intent.budgetMaxNok) score += 12;
-  if (intent.preferLongRange) score += car.winterRangeKm >= 420 ? 16 : car.winterRangeKm >= 380 ? 9 : 3;
-  if (intent.preferFastCharging) score += car.chargingMinutes <= 22 ? 14 : car.fastChargingKw >= 220 ? 10 : 4;
+  if (intent.preferLongRange)
+    score += car.winterRangeKm >= 420 ? 16 : car.winterRangeKm >= 380 ? 9 : 3;
+  if (intent.preferFastCharging)
+    score += car.chargingMinutes <= 22 ? 14 : car.fastChargingKw >= 220 ? 10 : 4;
   if (intent.preferFamily) score += car.seats >= 7 ? 14 : car.segment === "SUV" ? 10 : 4;
   if (intent.preferLuxury) score += car.interiorScore >= 9 ? 13 : car.priceNok >= 700000 ? 8 : 3;
-  if (intent.preferPerformance) score += car.accelerationSeconds <= 4 ? 13 : car.horsepower >= 400 ? 8 : 3;
+  if (intent.preferPerformance)
+    score += car.accelerationSeconds <= 4 ? 13 : car.horsepower >= 400 ? 8 : 3;
   if (intent.preferTowing) score += car.towingKg >= 2000 ? 14 : car.towingKg >= 1500 ? 8 : 2;
+  if (intent.preferValue) score += getValueScore(car);
   if (intent.preferWinter) score += car.heatPump ? 7 : 0;
 
   score += Math.min(10, getEfficiencyScore(car) * 1.6);
@@ -106,7 +121,10 @@ function getPreferenceScore(intent: SearchIntent, car: ReturnType<typeof getVehi
   return score;
 }
 
-function createReasons(intent: SearchIntent, car: ReturnType<typeof getVehicleDocuments>[number]["car"]) {
+function createReasons(
+  intent: SearchIntent,
+  car: ReturnType<typeof getVehicleDocuments>[number]["car"],
+) {
   const reasons = [
     `${car.winterRangeKm} km estimated winter range`,
     `${formatNok(car.priceNok)} Norwegian starting price`,
@@ -121,11 +139,19 @@ function createReasons(intent: SearchIntent, car: ReturnType<typeof getVehicleDo
   if (intent.preferTowing) {
     reasons.push(`${car.towingKg} kg towing capacity`);
   }
+  if (intent.preferValue) {
+    reasons.push(
+      `${Math.round(car.winterRangeKm / (car.priceNok / 100000))} winter km per NOK 100k`,
+    );
+  }
 
   return reasons.slice(0, 4);
 }
 
-function createTradeoffs(intent: SearchIntent, car: ReturnType<typeof getVehicleDocuments>[number]["car"]) {
+function createTradeoffs(
+  intent: SearchIntent,
+  car: ReturnType<typeof getVehicleDocuments>[number]["car"],
+) {
   const tradeoffs: string[] = [];
 
   if (intent.budgetMaxNok && car.priceNok > intent.budgetMaxNok) {
@@ -140,8 +166,19 @@ function createTradeoffs(intent: SearchIntent, car: ReturnType<typeof getVehicle
   if (intent.preferTowing && car.towingKg < 1800) {
     tradeoffs.push("Limited towing for cabin and trailer use");
   }
+  if (intent.preferValue && car.priceNok > 750000) {
+    tradeoffs.push("Premium price means it is not the sharpest deal");
+  }
 
   return tradeoffs.length > 0 ? tradeoffs : ["No major mismatch for the stated request"];
+}
+
+function getValueScore(car: ReturnType<typeof getVehicleDocuments>[number]["car"]) {
+  const winterKmPerNok100k = car.winterRangeKm / (car.priceNok / 100000);
+  const monthlyBonus =
+    car.monthlyNok <= 4500 ? 9 : car.monthlyNok <= 6000 ? 6 : car.monthlyNok <= 8000 ? 3 : 0;
+
+  return Math.min(18, Math.round(winterKmPerNok100k / 8) + monthlyBonus);
 }
 
 function createLocalSummary(query: string, recommendations: AIRecommendation[]) {

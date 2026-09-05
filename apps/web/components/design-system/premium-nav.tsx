@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 const items = [
   { href: "/cars", key: "cars" },
   { href: "/compare", key: "compare" },
+  { href: "/ai", key: "ai" },
   { href: "/launches", key: "launches" },
   { href: "/ev-guide", key: "evGuide" },
   { href: "/about", key: "about" },

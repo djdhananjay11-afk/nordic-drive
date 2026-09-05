@@ -13,6 +13,7 @@ export const searchIntentSchema = z.object({
   preferLuxury: z.boolean().default(false),
   preferPerformance: z.boolean().default(false),
   preferTowing: z.boolean().default(false),
+  preferValue: z.boolean().default(false),
   preferWinter: z.boolean().default(true),
   query: z.string(),
 });
@@ -26,8 +27,8 @@ export async function parseSearchIntent(query: string): Promise<SearchIntent> {
     {
       maxOutputTokens: 500,
       system:
-        "You parse Norwegian EV shopping requests into strict JSON filters. Extract explicit constraints only. Keep booleans true when intent is strongly implied.",
-      user: `Parse this NordicDrive EV request: ${query}\nSchema keys: budgetMaxNok, minRangeKm, minSeats, bodyType, preferFastCharging, preferLongRange, preferFamily, preferLuxury, preferPerformance, preferTowing, preferWinter, query.`,
+        "You parse Norwegian EV shopping requests into strict JSON filters. Extract explicit constraints only. Keep booleans true when intent is strongly implied. Treat best offer, deal, value, cheap, affordable, monthly payment, kampanje, tilbud, billig, prisgunstig as preferValue.",
+      user: `Parse this NordicDrive EV request: ${query}\nSchema keys: budgetMaxNok, minRangeKm, minSeats, bodyType, preferFastCharging, preferLongRange, preferFamily, preferLuxury, preferPerformance, preferTowing, preferValue, preferWinter, query.`,
     },
     fallback,
   ).then((intent) => searchIntentSchema.catch(fallback).parse({ ...fallback, ...intent, query }));
@@ -37,11 +38,19 @@ function parseSearchIntentLocally(query: string): SearchIntent {
   const normalizedQuery = query.toLowerCase();
   const budgetMaxNok = extractBudget(normalizedQuery);
   const minRangeKm = extractRange(normalizedQuery);
-  const preferFamily = /family|familie|children|kids|barn|7 seat|seven seat|sju/.test(normalizedQuery);
+  const preferFamily = /family|familie|children|kids|barn|7 seat|seven seat|sju/.test(
+    normalizedQuery,
+  );
   const preferPerformance = /performance|fast|quick|sport|acceleration|rask/.test(normalizedQuery);
   const preferLuxury = /luxury|premium|luksus|comfort|komfort|quiet/.test(normalizedQuery);
   const preferTowing = /tow|towing|trailer|henger|cabin|hytta|hytte/.test(normalizedQuery);
-  const preferFastCharging = /fast charg|charging|hurtiglad|lade|road trip|langtur/.test(normalizedQuery);
+  const preferValue =
+    /best offer|offer|deal|value|cheap|affordable|lowest price|monthly|lease|campaign|tilbud|kampanje|billig|rimelig|prisgunstig|lavest pris/.test(
+      normalizedQuery,
+    );
+  const preferFastCharging = /fast charg|charging|hurtiglad|lade|road trip|langtur/.test(
+    normalizedQuery,
+  );
   const preferLongRange = /long range|range|rekkevidde|lang rekkevidde/.test(normalizedQuery);
   const bodyType = extractBodyType(normalizedQuery);
   const explicitSeats = normalizedQuery.match(/(\d)\s*(seat|seats|seter)/);
@@ -58,13 +67,16 @@ function parseSearchIntentLocally(query: string): SearchIntent {
     preferLuxury,
     preferPerformance,
     preferTowing,
+    preferValue,
     preferWinter: !/summer only|sommer/.test(normalizedQuery),
     query,
   };
 }
 
 function extractBudget(query: string) {
-  const underMatch = query.match(/(?:under|below|max|budget|less than|under)\s*(\d[\d\s.]*)\s*(?:nok|kr|k)?/);
+  const underMatch = query.match(
+    /(?:under|below|max|budget|less than|under|budsjett|maks|under)\s*(\d[\d\s.]*)\s*(?:nok|kr|k)?/,
+  );
   const nokMatch = query.match(/(\d[\d\s.]*)\s*(?:nok|kr)/);
   const raw = underMatch?.[1] ?? nokMatch?.[1];
 
@@ -89,6 +101,7 @@ function extractBodyType(query: string): SearchIntent["bodyType"] {
   if (query.includes("suv")) return "SUV";
   if (query.includes("sedan")) return "Sedan";
   if (query.includes("crossover")) return "Crossover";
-  if (query.includes("wagon") || query.includes("estate") || query.includes("stasjonsvogn")) return "Wagon";
+  if (query.includes("wagon") || query.includes("estate") || query.includes("stasjonsvogn"))
+    return "Wagon";
   return undefined;
 }
