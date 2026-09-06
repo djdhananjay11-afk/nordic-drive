@@ -145,6 +145,15 @@ Output Directory: default
 Root Directory: repository root
 ```
 
+If you already configured Vercel with `apps/web` as the Root Directory, keep the same build command:
+
+```text
+Build Command: pnpm vercel-build
+```
+
+The web package also provides this script and will generate Prisma from the monorepo root before
+running `next build`.
+
 Required Vercel environment variables:
 
 ```text

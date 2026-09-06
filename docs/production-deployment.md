@@ -75,6 +75,10 @@ Recommended Vercel project settings:
 - Node.js: 20+.
 - Framework preset: Next.js.
 
+If the Vercel project is already configured with `apps/web` as the root directory, use the same
+build command. `apps/web/package.json` includes a `vercel-build` script that generates Prisma from
+the monorepo root and then runs `next build`.
+
 The app uses:
 
 - ISR on public catalog pages via `revalidate`.
