@@ -17,7 +17,10 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,yml,yaml,css}\"",
     "db:generate": "pnpm --filter @nordicdrive/database prisma:generate",
     "db:migrate": "pnpm --filter @nordicdrive/database prisma:migrate",
-    "db:studio": "pnpm --filter @nordicdrive/database prisma:studio"
+    "db:deploy": "pnpm --filter @nordicdrive/database prisma:deploy",
+    "db:seed": "pnpm --filter @nordicdrive/database seed",
+    "db:studio": "pnpm --filter @nordicdrive/database prisma:studio",
+    "vercel-build": "pnpm db:generate && turbo build --filter=@nordicdrive/web..."
   },
   "devDependencies": {
     "@nordicdrive/eslint-config": "workspace:*",

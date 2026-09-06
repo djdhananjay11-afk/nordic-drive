@@ -6,7 +6,7 @@ This guide describes the production setup for the NordicDrive monorepo.
 
 - Frontend: Vercel, Next.js App Router, ISR, Vercel CDN, Next Image Optimization.
 - Database: Supabase PostgreSQL with Prisma migrations.
-- API: NestJS container, deployable to Fly.io, Render, Railway, Azure Container Apps, or another Docker host.
+- API: Next.js route handlers for the first launch. The NestJS service can be deployed later only if the platform needs a separate API runtime.
 - Assets: Supabase Storage or another signed media bucket for uploaded images and 3D assets.
 - Search: Algolia for instant search, local fallback for development.
 - AI: OpenAI API for recommendations, semantic search, quiz, and comparison summaries.
@@ -19,6 +19,7 @@ Set these in Vercel for the web project:
 NEXT_PUBLIC_APP_URL=https://www.nordicdrive.no
 NEXT_PUBLIC_API_URL=https://api.nordicdrive.no
 DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
 AUTH_SECRET=<openssl-rand-base64-32>
 AUTH_URL=https://www.nordicdrive.no
 AUTH_GITHUB_ID=
@@ -40,6 +41,7 @@ NODE_ENV=production
 API_PORT=4000
 NEXT_PUBLIC_APP_URL=https://www.nordicdrive.no
 DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
 JWT_SECRET=<long-random-secret>
 JWT_ISSUER=nordicdrive
 JWT_AUDIENCE=nordicdrive-api
@@ -51,15 +53,16 @@ LOG_LEVEL=info
 
 1. Create a Supabase project in the Norway/EU-adjacent region that best matches latency and compliance needs.
 2. Copy the pooled PostgreSQL connection string into `DATABASE_URL`.
-3. Run migrations from CI or a release job:
+3. Copy the direct PostgreSQL connection string into `DIRECT_URL`.
+4. Run migrations from CI or a release job:
 
 ```bash
-pnpm --filter @nordicdrive/database prisma:deploy
+pnpm db:deploy
 pnpm db:generate
 ```
 
-4. Enable point-in-time recovery before real production traffic.
-5. Create separate Supabase service keys for production and preview environments.
+5. Enable point-in-time recovery before real production traffic.
+6. Create separate Supabase service keys for production and preview environments.
 
 ## Vercel Frontend
 
@@ -67,7 +70,7 @@ Recommended Vercel project settings:
 
 - Root directory: repository root.
 - Install command: `corepack enable && pnpm install --frozen-lockfile`.
-- Build command: `pnpm --filter @nordicdrive/web build`.
+- Build command: `pnpm vercel-build`.
 - Output: Next.js default.
 - Node.js: 20+.
 - Framework preset: Next.js.
@@ -80,29 +83,13 @@ The app uses:
 - `no-store` headers for auth/admin/AI POST surfaces.
 - Next Image Optimization with AVIF/WebP and a 30-day minimum remote cache TTL.
 
-## Docker
-
-Local production-style run:
-
-```bash
-docker compose up --build
-```
-
-Services:
-
-- `postgres`: PostgreSQL 16.
-- `api`: NestJS API at `http://localhost:4000/api/v1/health`.
-- `web`: Next.js standalone runtime at `http://localhost:3000/api/health`.
-
-Both web and API images run as non-root users and expose Docker health checks.
-
 ## CI/CD
 
 `CI` workflow:
 
 - Installs dependencies.
 - Generates Prisma Client.
-- Deploys migrations against a PostgreSQL service container.
+- Deploys migrations against PostgreSQL.
 - Checks formatting.
 - Runs lint, typecheck, build.
 - Runs Lighthouse CI against key public pages.

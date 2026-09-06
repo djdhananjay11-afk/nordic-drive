@@ -26,6 +26,7 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://nordicdrive:nordicdrive@localhost:5432/nordicdrive?schema=public
+      DIRECT_URL: postgresql://nordicdrive:nordicdrive@localhost:5432/nordicdrive?schema=public
       AUTH_SECRET: ci-auth-secret-replace-in-production
       AUTH_URL: http://localhost:3000
       JWT_SECRET: ci-jwt-secret-that-is-long-enough-for-validation

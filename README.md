@@ -10,7 +10,8 @@ Production-grade automotive comparison platform for Norway.
 - PostgreSQL and Prisma schema with initial migration
 - Shared types package
 - Shared ESLint and TypeScript config packages
-- Docker Compose for local PostgreSQL and API
+- Vercel-first frontend deployment
+- Supabase PostgreSQL connection setup
 - CI workflow for lint, typecheck, migrations, and builds
 
 ## Structure
@@ -33,17 +34,14 @@ docs/
 
 - Node.js 20+
 - pnpm 9+
-- Docker Desktop
+- Supabase PostgreSQL project
 
 ## Setup
 
 ```bash
 pnpm install
 cp .env.example .env
-docker compose up -d postgres
 pnpm db:generate
-pnpm db:migrate
-pnpm --filter @nordicdrive/database seed
 pnpm dev
 ```
 
@@ -69,6 +67,16 @@ AUTH_SECRET
 AUTH_URL
 ```
 
+For Supabase PostgreSQL, configure both database URLs:
+
+```text
+DATABASE_URL
+DIRECT_URL
+```
+
+Use the Supabase pooled connection string for `DATABASE_URL` and the direct database connection
+string for `DIRECT_URL`. Prisma uses `DIRECT_URL` for migrations.
+
 ## Database
 
 Prisma schema lives at:
@@ -82,7 +90,8 @@ Useful commands:
 ```bash
 pnpm db:generate
 pnpm db:migrate
-pnpm --filter @nordicdrive/database prisma:deploy
+pnpm db:deploy
+pnpm db:seed
 pnpm db:studio
 ```
 
@@ -121,12 +130,41 @@ Responses are wrapped as:
 ## Deployment Direction
 
 - Web: Vercel
-- API: containerized service on Fly.io, Render, Railway, or similar
+- API: optional separate service later, or Next.js route handlers for the first launch
 - Database: Supabase PostgreSQL
 - Storage: Supabase Storage or equivalent CDN-backed object storage
 - Monitoring: Sentry plus structured logs
 
-Full production deployment, caching, monitoring, CI/CD, Docker, and security guidance:
+Recommended Vercel project settings:
+
+```text
+Framework Preset: Next.js
+Install Command: pnpm install
+Build Command: pnpm vercel-build
+Output Directory: default
+Root Directory: repository root
+```
+
+Required Vercel environment variables:
+
+```text
+AUTH_SECRET
+AUTH_URL
+DATABASE_URL
+DIRECT_URL
+NEXT_PUBLIC_APP_URL
+NEXT_PUBLIC_API_URL
+NEXT_PUBLIC_ENABLE_R3F_VIEWER
+```
+
+Run database migrations from your machine or CI before production traffic:
+
+```bash
+pnpm db:deploy
+pnpm db:seed
+```
+
+Full production deployment, caching, monitoring, CI/CD, and security guidance:
 
 ```text
 docs/production-deployment.md
