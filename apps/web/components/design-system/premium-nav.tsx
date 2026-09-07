@@ -33,7 +33,7 @@ export function PremiumNav({
         className,
       )}
     >
-      <div className="mx-auto flex h-14 max-w-[1560px] items-center justify-between px-5 md:px-8">
+      <div className="mx-auto flex min-h-14 max-w-[1560px] flex-wrap items-center justify-between gap-2 px-5 py-1 md:px-8">
         <Link
           className="font-display text-lg font-semibold tracking-[0.18em]"
           href={localizePath(locale, "/") as Route}
@@ -54,20 +54,28 @@ export function PremiumNav({
         <div className="flex items-center gap-2">
           <LanguageSwitcher activeLocale={locale} />
           <Button
+            asChild
             aria-label={dictionary.search}
-            className="bg-transparent"
+            title={dictionary.search}
+            className="h-11 w-11 shrink-0 bg-transparent p-0"
             size="icon"
             variant="ghost"
           >
-            <Search className="size-4" />
+            <Link href={localizePath(locale, "/cars") as Route}>
+              <Search aria-hidden="true" className="size-5" />
+            </Link>
           </Button>
           <Button
+            asChild
             aria-label={dictionary.signIn}
-            className="hidden bg-transparent sm:inline-flex"
+            title={dictionary.signIn}
+            className="h-11 w-11 shrink-0 bg-transparent p-0"
             size="icon"
             variant="ghost"
           >
-            <UserRound className="size-4" />
+            <Link href="/admin">
+              <UserRound aria-hidden="true" className="size-5" />
+            </Link>
           </Button>
           <Button
             aria-label={dictionary.menu}

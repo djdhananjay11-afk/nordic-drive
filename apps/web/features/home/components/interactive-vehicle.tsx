@@ -33,7 +33,7 @@ export function InteractiveVehicle({ car, className }: { car: NordicCar; classNa
   return (
     <div
       className={cn(
-        "relative mx-auto h-[310px] w-full max-w-5xl touch-pan-y md:h-[430px]",
+        "relative mx-auto h-[280px] w-full max-w-4xl touch-pan-y sm:h-[330px] md:h-[430px]",
         className,
       )}
       onMouseLeave={() => {
@@ -49,16 +49,16 @@ export function InteractiveVehicle({ car, className }: { car: NordicCar; classNa
         });
       }}
     >
-      <div className="absolute inset-x-[4%] bottom-8 h-28 rounded-[50%] bg-slate-900/12 blur-3xl" />
+      <div className="absolute inset-x-[8%] bottom-8 h-24 rounded-[50%] bg-slate-900/12 blur-3xl md:inset-x-[4%] md:h-28" />
       <motion.div
-        className="absolute inset-x-[2%] bottom-14 h-52 [transform-style:preserve-3d] md:bottom-16 md:h-72"
+        className="absolute inset-x-[6%] bottom-14 h-44 [transform-style:preserve-3d] sm:h-52 md:inset-x-[2%] md:bottom-16 md:h-72"
         style={{ rotateX, rotateY }}
       >
         <div className="absolute inset-x-[8%] bottom-4 h-24 rounded-[50%] bg-slate-400/20 blur-2xl [transform:translateZ(-80px)]" />
         <VehicleImage
           car={car}
-          className="absolute inset-x-0 bottom-4 h-48 rounded-[1.25rem] border border-white/70 bg-white/42 shadow-[0_48px_100px_rgba(15,23,42,0.20)] [transform:translateZ(42px)] md:h-64"
-          imageClassName="object-contain p-5"
+          className="absolute inset-x-0 bottom-4 h-40 rounded-[1.25rem] border border-white/70 bg-white/42 shadow-[0_48px_100px_rgba(15,23,42,0.20)] [transform:translateZ(42px)] sm:h-48 md:h-64"
+          imageClassName="object-contain p-4 sm:p-5"
           priority
           sizes="(min-width: 1024px) 960px, 100vw"
         />
@@ -69,7 +69,7 @@ export function InteractiveVehicle({ car, className }: { car: NordicCar; classNa
       >
         Move cursor to tilt preview
       </motion.div>
-      <div className="absolute inset-x-4 bottom-0 mx-auto max-w-xl rounded-xl border border-white/70 bg-white/60 px-4 py-3 text-center shadow-sm backdrop-blur-xl">
+      <div className="absolute inset-x-6 bottom-0 mx-auto max-w-xl rounded-xl border border-white/70 bg-white/60 px-4 py-3 text-center shadow-sm backdrop-blur-xl">
         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
           Featured hero car
         </div>

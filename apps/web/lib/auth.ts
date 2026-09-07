@@ -9,6 +9,10 @@ import { isAdminRole, ROLE_PERMISSIONS } from "@/lib/rbac";
 const configuredAuthSecret =
   process.env.AUTH_SECRET?.trim() || process.env.NEXTAUTH_SECRET?.trim() || undefined;
 
+export const githubAuthConfigured = Boolean(
+  process.env.AUTH_GITHUB_ID?.trim() && process.env.AUTH_GITHUB_SECRET?.trim(),
+);
+
 const authSecret =
   configuredAuthSecret ??
   (process.env.NODE_ENV !== "production"
@@ -23,11 +27,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 60 * 60 * 24 * 7,
     updateAge: 60 * 15,
   },
-  providers: [
+  providers: githubAuthConfigured ? [
     GitHub({
       allowDangerousEmailAccountLinking: false,
     }),
-  ],
+  ] : [],
   callbacks: {
     async jwt({ token, user, account }) {
       const email = user?.email ?? token.email;
@@ -74,5 +78,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 });

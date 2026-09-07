@@ -36,7 +36,7 @@ export function HomeSearch({
 
   return (
     <motion.div
-      className="mx-auto w-full max-w-4xl rounded-2xl border border-white/70 bg-white/58 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-2xl"
+      className="mx-auto w-full max-w-3xl rounded-2xl border border-white/70 bg-white/58 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-2xl"
       initial={{ opacity: 0, y: 24 }}
       transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       viewport={{ once: true }}
@@ -60,7 +60,7 @@ export function HomeSearch({
           {copy.advanced}
         </Link>
       </div>
-      <div className="mt-3 grid gap-2 md:grid-cols-4">
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {results.map((car) => (
           <Link
             className="rounded-xl bg-slate-50 px-4 py-3 text-left transition hover:bg-slate-100"

@@ -24,9 +24,9 @@ import { VehicleImage } from "@/features/cars/components/vehicle-image";
 import type { HomeArticle, HomeComparison } from "@/features/home/data/home-data";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 import type { HomeDictionary } from "@/lib/i18n/dictionaries";
+import { cn } from "@/lib/utils";
 import { HomeSearch } from "./home-search";
 import { InteractiveVehicle } from "./interactive-vehicle";
-import { cn } from "@/lib/utils";
 
 type HomePageViewProps = {
   copy: HomeDictionary;
@@ -66,12 +66,12 @@ export function HomePageView({
 
   return (
     <main className="overflow-hidden bg-[#f6f8fb] text-slate-950">
-      <section className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-5 pb-8 pt-24 text-center">
+      <section className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-6 pb-8 pt-24 text-center sm:px-8 lg:px-10">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#f7f9fc_0%,#e8f1f8_52%,#f9fafb_100%)]" />
         <div className="absolute inset-x-0 top-0 h-[52vh] bg-[radial-gradient(circle_at_50%_0%,rgba(118,176,214,0.42),transparent_62%)]" />
         <FloatingParticles className="z-0 opacity-55" />
         <motion.div
-          className="relative z-10 mx-auto max-w-6xl"
+          className="relative z-10 mx-auto max-w-5xl"
           style={{ opacity: heroOpacity, y: heroY }}
         >
           <motion.p
@@ -84,7 +84,7 @@ export function HomePageView({
           </motion.p>
           <motion.h1
             animate={{ opacity: 1, y: 0 }}
-            className="mx-auto mt-4 max-w-5xl text-5xl font-semibold leading-[0.96] tracking-normal md:text-7xl lg:text-8xl"
+            className="mx-auto mt-4 max-w-4xl text-4xl font-semibold leading-[0.98] tracking-normal sm:text-5xl md:text-7xl lg:text-8xl"
             initial={{ opacity: 0, y: 24 }}
             transition={{ delay: 0.08, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
@@ -92,7 +92,7 @@ export function HomePageView({
           </motion.h1>
           <motion.p
             animate={{ opacity: 1, y: 0 }}
-            className="mx-auto mt-5 max-w-2xl text-lg font-medium leading-8 text-slate-600 md:text-xl"
+            className="mx-auto mt-5 max-w-xl text-base font-medium leading-7 text-slate-600 sm:text-lg md:max-w-2xl md:text-xl md:leading-8"
             initial={{ opacity: 0, y: 24 }}
             transition={{ delay: 0.18, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
@@ -124,7 +124,7 @@ export function HomePageView({
 
         <div className="relative z-10 w-full">
           {selectedHeroCar ? <InteractiveVehicle car={selectedHeroCar} className="mt-6" /> : null}
-          <div className="mx-auto mt-4 flex max-w-4xl flex-wrap items-center justify-center gap-2">
+          <div className="mx-auto mt-4 flex max-w-3xl flex-wrap items-center justify-center gap-2 px-1">
             {heroCars.map((car) => {
               const carKey = `${car.brandSlug}-${car.modelSlug}`;
               const isSelected = selectedHeroCarKey === carKey;
@@ -147,7 +147,7 @@ export function HomePageView({
             })}
           </div>
           <HomeSearch cars={featuredCars} copy={copy.search} locale={locale} />
-          <div className="mx-auto mt-4 flex max-w-4xl flex-col items-center justify-center gap-2 rounded-xl border border-white/70 bg-white/55 px-4 py-3 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur md:flex-row md:gap-4">
+          <div className="mx-auto mt-4 flex max-w-3xl flex-col items-center justify-center gap-2 rounded-xl border border-white/70 bg-white/55 px-4 py-3 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur md:flex-row md:gap-4">
             <span>{copy.trust.disclaimer}</span>
             <Link
               className="inline-flex items-center text-slate-950 transition hover:text-slate-600"
@@ -319,7 +319,7 @@ export function HomePageView({
         </div>
       </HomeSection>
 
-      <section className="relative overflow-hidden bg-slate-950 px-5 py-28 text-center text-white">
+      <section className="relative overflow-hidden bg-slate-950 px-6 py-24 text-center text-white sm:px-8 lg:px-10 lg:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.24),transparent_55%)]" />
         <FloatingParticles className="opacity-30" />
         <motion.div
@@ -345,7 +345,7 @@ export function HomePageView({
             className="mt-9 rounded-md bg-white text-slate-950 hover:bg-white/90"
             size="xl"
           >
-            <Link href={localizePath(locale, "/compare") as Route}>
+            <Link href={localizePath(locale, "/ai") as Route}>
               {copy.ai.button}
               <Sparkles className="ml-2 size-4" />
             </Link>
@@ -370,16 +370,22 @@ function HomeSection({
   description: string;
 }) {
   return (
-    <section className={dark ? "bg-slate-950 px-5 py-28 text-white" : "px-5 py-28"}>
+    <section
+      className={
+        dark
+          ? "bg-slate-950 px-6 py-24 text-white sm:px-8 lg:px-10 lg:py-28"
+          : "px-6 py-24 sm:px-8 lg:px-10 lg:py-28"
+      }
+    >
       <motion.div
-        className="mx-auto max-w-7xl"
+        className="mx-auto max-w-6xl"
         initial="hidden"
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         variants={fadeUp}
         viewport={{ once: true, margin: "-120px" }}
         whileInView="visible"
       >
-        <div className="mb-14 max-w-3xl">
+        <div className="mx-auto mb-12 max-w-3xl text-center md:mx-0 md:mb-14 md:text-left">
           <p
             className={
               dark
@@ -389,12 +395,14 @@ function HomeSection({
           >
             {eyebrow}
           </p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-normal md:text-6xl">{title}</h2>
+          <h2 className="mt-4 text-3xl font-semibold tracking-normal sm:text-4xl md:text-6xl">
+            {title}
+          </h2>
           <p
             className={
               dark
                 ? "mt-5 max-w-2xl leading-8 text-white/62"
-                : "mt-5 max-w-2xl leading-8 text-slate-600"
+                : "mt-5 max-w-2xl leading-8 text-slate-600 md:mx-0"
             }
           >
             {description}

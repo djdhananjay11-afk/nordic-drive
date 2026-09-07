@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { getLocaleFromPathname, localizePath } from "@/lib/i18n/config";
 import { MiniVehicle } from "@/features/cars/components/mini-vehicle";
 import {
   buildComparison,
@@ -41,7 +42,9 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
   const router = useRouter();
   const pathname = usePathname();
   const allVehicles = useMemo(() => allCars.map(enrichCar), [allCars]);
-  const [selectedKeys, setSelectedKeys] = useState(initialComparison.vehicles.map((car) => car.key));
+  const [selectedKeys, setSelectedKeys] = useState(
+    initialComparison.vehicles.map((car) => car.key),
+  );
   const [remoteSummary, setRemoteSummary] = useState(initialComparison.summary);
 
   const selectedVehicles = useMemo(
@@ -57,6 +60,11 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
   const availableVehicles = allVehicles.filter((car) => !selectedKeys.includes(car.key));
 
   useEffect(() => {
+    if (selectedKeys.length === 0) {
+      router.replace(pathname as Route, { scroll: false });
+      return;
+    }
+
     const params = new URLSearchParams();
     params.set("vehicles", formatComparisonVehiclesParam(selectedKeys));
     router.replace(`${pathname}?${params.toString()}` as Route, { scroll: false });
@@ -66,8 +74,15 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
     const controller = new AbortController();
 
     async function loadSummary() {
+      if (selectedKeys.length === 0) {
+        setRemoteSummary(comparison.summary);
+        return;
+      }
+
       try {
-        const params = new URLSearchParams({ vehicles: formatComparisonVehiclesParam(selectedKeys) });
+        const params = new URLSearchParams({
+          vehicles: formatComparisonVehiclesParam(selectedKeys),
+        });
         const response = await fetch(`/api/compare?${params.toString()}`, {
           signal: controller.signal,
         });
@@ -95,26 +110,25 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
   };
 
   const removeVehicle = (key: string) => {
-    if (selectedKeys.length <= 2) {
-      return;
-    }
     setSelectedKeys((current) => current.filter((candidate) => candidate !== key));
   };
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef4f8_44%,#ffffff_100%)] text-slate-950">
-      <section className="relative overflow-hidden px-5 pb-10 pt-24">
+      <section className="relative overflow-hidden px-6 pb-10 pt-24 sm:px-8 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.92),rgba(219,234,254,0.58)_42%,rgba(241,245,249,0)_74%)]" />
         <div className="absolute left-1/2 top-0 h-72 w-[760px] -translate-x-1/2 rounded-full bg-white/70 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl items-end gap-8 lg:grid-cols-[1fr_0.82fr]">
+        <div className="relative mx-auto grid max-w-6xl items-end gap-8 lg:grid-cols-[1fr_0.82fr]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Comparison engine</p>
-            <h1 className="mt-4 max-w-4xl text-5xl font-semibold tracking-normal md:text-7xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">
+              Comparison engine
+            </p>
+            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-normal sm:text-5xl md:text-7xl">
               Decide with every meaningful metric visible.
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-              Compare up to four EVs across Norwegian pricing, winter range, charging, safety, cabin quality, dimensions,
-              warranty, and performance.
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+              Compare up to four EVs across Norwegian pricing, winter range, charging, safety, cabin
+              quality, dimensions, warranty, and performance.
             </p>
           </div>
 
@@ -129,9 +143,10 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
         </div>
       </section>
 
-      <section className="px-5 py-6">
-        <div className="mx-auto max-w-7xl">
+      <section className="px-6 py-6 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-6xl">
           <VehiclePicker
+            browseHref={`${localizePath(getLocaleFromPathname(pathname) ?? "en", "/cars")}?${new URLSearchParams({ vehicles: formatComparisonVehiclesParam(selectedKeys) })}`}
             availableVehicles={availableVehicles}
             canAdd={selectedKeys.length < 4}
             onAdd={addVehicle}
@@ -149,7 +164,7 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
                     onRemove={() => removeVehicle(car.key)}
                     rank={score?.rank ?? 0}
                     score={score?.score ?? 0}
-                    showRemove={comparison.vehicles.length > 2}
+                    showRemove
                   />
                 );
               })}
@@ -158,70 +173,120 @@ export function ComparisonPageView({ allCars, initialComparison }: ComparisonPag
         </div>
       </section>
 
-      <section className="px-5 py-8">
-        <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-4">
-          <AnimatedStat icon={Snowflake} label="Range leader" value={getBestLabel(comparison, "winterRangeKm")} />
-          <AnimatedStat icon={Zap} label="Fastest charge" value={getBestLabel(comparison, "chargingMinutes")} />
-          <AnimatedStat icon={ShieldCheck} label="Safety leader" value={getBestLabel(comparison, "safetyScore")} />
-          <AnimatedStat icon={Gauge} label="Performance" value={getBestLabel(comparison, "accelerationSeconds")} />
+      <section className="px-6 py-8 sm:px-8 lg:px-10">
+        <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <AnimatedStat
+            icon={Snowflake}
+            label="Range leader"
+            value={getBestLabel(comparison, "winterRangeKm")}
+          />
+          <AnimatedStat
+            icon={Zap}
+            label="Fastest charge"
+            value={getBestLabel(comparison, "chargingMinutes")}
+          />
+          <AnimatedStat
+            icon={ShieldCheck}
+            label="Safety leader"
+            value={getBestLabel(comparison, "safetyScore")}
+          />
+          <AnimatedStat
+            icon={Gauge}
+            label="Performance"
+            value={getBestLabel(comparison, "accelerationSeconds")}
+          />
         </div>
       </section>
 
-      <section className="px-5 py-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 lg:grid-cols-2">
-            {comparison.charts.map((chart) => (
-              <ComparisonChart chart={chart} key={chart.id} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 py-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Sticky table</p>
-              <h2 className="mt-2 text-3xl font-semibold md:text-4xl">Deep specification view</h2>
+      <section className="px-6 py-8 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-6xl">
+          {comparison.vehicles.length > 0 ? (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {comparison.charts.map((chart) => (
+                <ComparisonChart chart={chart} key={chart.id} />
+              ))}
             </div>
-            <div className="text-sm text-slate-500">Best values are highlighted automatically.</div>
-          </div>
-          <ResponsiveComparisonTable comparison={comparison} />
+          ) : (
+            <EmptyComparisonState />
+          )}
         </div>
       </section>
 
-      <section className="px-5 pb-24 pt-8">
-        <div className="mx-auto max-w-7xl">
-          <GlassCard className="overflow-hidden bg-white/78 p-7 shadow-sm md:p-9">
-            <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
+      {comparison.vehicles.length > 0 ? (
+        <section className="px-6 py-8 sm:px-8 lg:px-10">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  <BrainCircuit className="size-4" />
-                  Recommendation signals
-                </div>
-                <h2 className="mt-4 text-3xl font-semibold">What NordicDrive would prioritize</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
+                  Sticky table
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold md:text-4xl">Deep specification view</h2>
               </div>
-              <div className="grid gap-3 md:grid-cols-3">
-                {summary.highlights.map((highlight) => (
-                  <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-700" key={highlight}>
-                    {highlight}
-                  </div>
-                ))}
+              <div className="text-sm text-slate-500">
+                Best values are highlighted automatically.
               </div>
             </div>
-          </GlassCard>
-        </div>
-      </section>
+            <ResponsiveComparisonTable comparison={comparison} />
+          </div>
+        </section>
+      ) : null}
+
+      {comparison.vehicles.length > 0 ? (
+        <section className="px-6 pb-24 pt-8 sm:px-8 lg:px-10">
+          <div className="mx-auto max-w-6xl">
+            <GlassCard className="overflow-hidden bg-white/78 p-7 shadow-sm md:p-9">
+              <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    <BrainCircuit className="size-4" />
+                    Recommendation signals
+                  </div>
+                  <h2 className="mt-4 text-3xl font-semibold">What NordicDrive would prioritize</h2>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {summary.highlights.map((highlight) => (
+                    <div
+                      className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-700"
+                      key={highlight}
+                    >
+                      {highlight}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
 
+function EmptyComparisonState() {
+  return (
+    <GlassCard className="bg-white/78 p-8 text-center shadow-sm md:p-12">
+      <div className="mx-auto grid size-12 place-items-center rounded-full bg-slate-950 text-white">
+        <Plus className="size-5" />
+      </div>
+      <h2 className="mx-auto mt-5 max-w-xl text-3xl font-semibold text-slate-950">
+        Start by adding the EVs you want to compare.
+      </h2>
+      <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+        NordicDrive will build the scorecards, charts, and specification table after you select one
+        or more vehicles.
+      </p>
+    </GlassCard>
+  );
+}
+
 function VehiclePicker({
+  browseHref,
   availableVehicles,
   canAdd,
   onAdd,
   selectedCount,
 }: {
+  browseHref: string;
   availableVehicles: ComparisonVehicle[];
   canAdd: boolean;
   onAdd: (key: string) => void;
@@ -230,12 +295,14 @@ function VehiclePicker({
   return (
     <GlassCard className="flex flex-col gap-4 bg-white/78 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
       <div>
-        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Vehicle slots</div>
+        <div className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
+          Vehicle slots
+        </div>
         <div className="mt-1 text-xl font-semibold">{selectedCount}/4 selected</div>
       </div>
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
         <select
-          className="h-11 min-w-72 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-950"
+          className="h-11 w-full rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-slate-950 sm:min-w-72"
           disabled={!canAdd}
           onChange={(event) => {
             onAdd(event.target.value);
@@ -250,7 +317,7 @@ function VehiclePicker({
           ))}
         </select>
         <Button asChild className="bg-slate-950 text-white hover:bg-slate-800" size="lg">
-          <Link href="/cars">
+          <Link href={browseHref as Route}>
             <Plus className="mr-2 size-4" />
             Browse cars
           </Link>
@@ -286,7 +353,9 @@ function SelectedVehicleCard({
         <div className="p-3">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">{car.brand}</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+                {car.brand}
+              </p>
               <h2 className="mt-1 text-xl font-semibold">{car.model}</h2>
             </div>
             {showRemove ? (
@@ -333,7 +402,9 @@ function AnimatedStat({
   return (
     <GlassCard className="bg-white/78 p-5 shadow-sm">
       <Icon className="size-5 text-slate-400" />
-      <div className="mt-5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</div>
+      <div className="mt-5 text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+        {label}
+      </div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}
         className="mt-2 text-xl font-semibold text-slate-950"
@@ -377,14 +448,22 @@ function ComparisonChart({ chart }: { chart: ComparisonChartSeries }) {
             <div key={point.carKey}>
               <div className="mb-2 flex items-center justify-between gap-4 text-sm">
                 <span className="truncate font-semibold text-slate-700">{point.label}</span>
-                <span className={cn("font-semibold", point.isBest ? "text-slate-950" : "text-slate-500")}>
+                <span
+                  className={cn(
+                    "font-semibold",
+                    point.isBest ? "text-slate-950" : "text-slate-500",
+                  )}
+                >
                   {point.displayValue}
                 </span>
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-slate-100">
                 <motion.div
                   animate={{ width: `${normalized}%` }}
-                  className={cn("h-full rounded-full", point.isBest ? "bg-slate-950" : "bg-slate-300")}
+                  className={cn(
+                    "h-full rounded-full",
+                    point.isBest ? "bg-slate-950" : "bg-slate-300",
+                  )}
                   initial={{ width: 0 }}
                   transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
                 />
@@ -409,7 +488,9 @@ function ResponsiveComparisonTable({ comparison }: { comparison: ComparisonResul
               </th>
               {comparison.vehicles.map((car) => (
                 <th className="min-w-48 border-b border-slate-200 p-4" key={car.key}>
-                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">{car.brand}</div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    {car.brand}
+                  </div>
                   <div className="mt-1 text-base font-semibold text-slate-950">{car.model}</div>
                 </th>
               ))}
@@ -441,7 +522,11 @@ function ResponsiveComparisonTable({ comparison }: { comparison: ComparisonResul
                         key={`${row.id}-${cell.carKey}`}
                       >
                         <div className="flex items-center gap-2">
-                          {cell.isBest ? <Check className="size-4" /> : row.direction === "neutral" ? <Minus className="size-4 text-slate-300" /> : null}
+                          {cell.isBest ? (
+                            <Check className="size-4" />
+                          ) : row.direction === "neutral" ? (
+                            <Minus className="size-4 text-slate-300" />
+                          ) : null}
                           {cell.displayValue}
                         </div>
                       </td>

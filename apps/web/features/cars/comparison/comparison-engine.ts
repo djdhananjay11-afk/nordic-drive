@@ -1,4 +1,9 @@
-import { formatNok, getCarBySlug, nordicCars, type NordicCar } from "@/features/cars/data/nordic-cars";
+import {
+  formatNok,
+  getCarBySlug,
+  nordicCars,
+  type NordicCar,
+} from "@/features/cars/data/nordic-cars";
 
 export type ComparisonCategory =
   | "Price"
@@ -105,12 +110,7 @@ export type ComparisonResult = {
   summary: ComparisonSummary;
 };
 
-type EnrichedSpec = Omit<
-  ComparisonVehicle,
-  | keyof NordicCar
-  | "key"
-  | "addKey"
->;
+type EnrichedSpec = Omit<ComparisonVehicle, keyof NordicCar | "key" | "addKey">;
 
 type ComparisonMetric = {
   id: ComparisonMetricId;
@@ -122,12 +122,6 @@ type ComparisonMetric = {
   value: (car: ComparisonVehicle) => number | boolean | string;
   format: (value: number | boolean | string, car: ComparisonVehicle) => string;
 };
-
-const defaultVehicleKeys = [
-  "tesla:model-y-long-range",
-  "bmw:ix-xdrive50",
-  "hyundai:ioniq-5-awd",
-];
 
 const supplementalSpecs: Record<string, EnrichedSpec> = {
   "tesla:model-y-long-range": {
@@ -478,17 +472,12 @@ export function resolveComparisonVehicles(input: {
   add?: string | string[] | null | undefined;
 }) {
   const requestedKeys = normalizeRequestedKeys(input.vehicles);
-  const addKeys = normalizeRequestedKeys(input.add)
-    .map(resolveAnyVehicleKey)
-    .filter(isString);
+  const addKeys = normalizeRequestedKeys(input.add).map(resolveAnyVehicleKey).filter(isString);
 
   const selected = [...requestedKeys.map(resolveAnyVehicleKey).filter(isString), ...addKeys];
   const uniqueKeys = selected.filter((key, index, keys) => keys.indexOf(key) === index).slice(0, 4);
-  const fallbackKeys = uniqueKeys.length > 0 ? defaultVehicleKeys : defaultVehicleKeys.slice(0, 3);
 
-  const finalKeys = [...uniqueKeys, ...fallbackKeys.filter((key) => !uniqueKeys.includes(key))].slice(0, 4);
-
-  return finalKeys.map(resolveVehicleByKey).filter(isNordicCar).map(enrichCar);
+  return uniqueKeys.map(resolveVehicleByKey).filter(isNordicCar).map(enrichCar);
 }
 
 export function buildComparison(vehicles: ComparisonVehicle[]): ComparisonResult {
@@ -554,7 +543,11 @@ function getBestValue(values: Array<number | boolean | string>, direction: Compa
   return direction === "lower" ? Math.min(...numericValues) : Math.max(...numericValues);
 }
 
-function scoreValue(value: number | boolean | string, values: Array<number | boolean | string>, direction: ComparisonDirection) {
+function scoreValue(
+  value: number | boolean | string,
+  values: Array<number | boolean | string>,
+  direction: ComparisonDirection,
+) {
   if (direction === "neutral") {
     return null;
   }
@@ -577,7 +570,10 @@ function scoreValue(value: number | boolean | string, values: Array<number | boo
     return 100;
   }
 
-  const ratio = direction === "higher" ? (numericValue - min) / (max - min) : (max - numericValue) / (max - min);
+  const ratio =
+    direction === "higher"
+      ? (numericValue - min) / (max - min)
+      : (max - numericValue) / (max - min);
   return Math.round(ratio * 100);
 }
 
@@ -606,12 +602,55 @@ function calculateScores(rows: ComparisonRow[], vehicles: ComparisonVehicle[]) {
     }));
 }
 
-function createChartSeries(vehicles: ComparisonVehicle[], rows: ComparisonRow[]): ComparisonChartSeries[] {
+function createChartSeries(
+  vehicles: ComparisonVehicle[],
+  rows: ComparisonRow[],
+): ComparisonChartSeries[] {
+  if (vehicles.length === 0) {
+    return [];
+  }
+
   return [
-    createChart("range", "Winter Range", "Cold-weather planning range for Norway.", "km", "higher", "winterRangeKm", vehicles, rows),
-    createChart("cost", "Price", "Lower starting price scores best.", "NOK", "lower", "priceNok", vehicles, rows),
-    createChart("charging", "Charging Window", "Lower 10-80% time is better.", "min", "lower", "chargingMinutes", vehicles, rows),
-    createChart("performance", "0-100 km/h", "Lower acceleration time is better.", "s", "lower", "accelerationSeconds", vehicles, rows),
+    createChart(
+      "range",
+      "Winter Range",
+      "Cold-weather planning range for Norway.",
+      "km",
+      "higher",
+      "winterRangeKm",
+      vehicles,
+      rows,
+    ),
+    createChart(
+      "cost",
+      "Price",
+      "Lower starting price scores best.",
+      "NOK",
+      "lower",
+      "priceNok",
+      vehicles,
+      rows,
+    ),
+    createChart(
+      "charging",
+      "Charging Window",
+      "Lower 10-80% time is better.",
+      "min",
+      "lower",
+      "chargingMinutes",
+      vehicles,
+      rows,
+    ),
+    createChart(
+      "performance",
+      "0-100 km/h",
+      "Lower acceleration time is better.",
+      "s",
+      "lower",
+      "accelerationSeconds",
+      vehicles,
+      rows,
+    ),
   ];
 }
 
@@ -658,7 +697,9 @@ function createComparisonSummary(
     return {
       title: "Comparison ready",
       narrative: "Add vehicles to generate a NordicDrive recommendation summary.",
-      highlights: ["Select two to four vehicles to compare price, range, charging, safety, and performance."],
+      highlights: [
+        "Select two to four vehicles to compare price, range, charging, safety, and performance.",
+      ],
     };
   }
 
@@ -680,7 +721,11 @@ function createComparisonSummary(
   };
 }
 
-function getLeader(vehicles: ComparisonVehicle[], rows: ComparisonRow[], metricId: ComparisonMetricId) {
+function getLeader(
+  vehicles: ComparisonVehicle[],
+  rows: ComparisonRow[],
+  metricId: ComparisonMetricId,
+) {
   const row = rows.find((candidate) => candidate.id === metricId);
   const bestCell = row?.cells.find((cell) => cell.isBest);
   return vehicles.find((car) => car.key === bestCell?.carKey) ?? vehicles[0];
@@ -714,7 +759,10 @@ function groupRows(rows: ComparisonRow[]): ComparisonSection[] {
 
 function normalizeRequestedKeys(value: string | string[] | null | undefined) {
   const values = Array.isArray(value) ? value : value ? [value] : [];
-  return values.flatMap((entry) => entry.split(",")).map((entry) => entry.trim()).filter(Boolean);
+  return values
+    .flatMap((entry) => entry.split(","))
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }
 
 function resolveAnyVehicleKey(value: string) {
@@ -729,7 +777,9 @@ function resolveAnyVehicleKey(value: string) {
 
   const [brandSlug, ...modelParts] = value.split("-");
   const modelSlug = modelParts.join("-");
-  return brandSlug && modelSlug && getCarBySlug(brandSlug, modelSlug) ? `${brandSlug}:${modelSlug}` : null;
+  return brandSlug && modelSlug && getCarBySlug(brandSlug, modelSlug)
+    ? `${brandSlug}:${modelSlug}`
+    : null;
 }
 
 function resolveVehicleByKey(key: string) {

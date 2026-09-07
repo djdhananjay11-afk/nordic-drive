@@ -56,6 +56,7 @@ export function CarListingView({
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const params = buildParams(effectiveFilters, 1);
+      preserveComparison(params);
       startTransition(async () => {
         const response = await fetch(`/api/cars/search?${params.toString()}`);
         const payload = (await response.json()) as { data: CarSearchResult };
@@ -69,6 +70,7 @@ export function CarListingView({
 
   async function goToPage(page: number) {
     const params = buildParams(effectiveFilters, page);
+    preserveComparison(params);
     const response = await fetch(`/api/cars/search?${params.toString()}`);
     const payload = (await response.json()) as { data: CarSearchResult };
     setResult(payload.data);
@@ -261,4 +263,9 @@ function buildParams(filters: ListingFilters, page: number) {
   });
 
   return params;
+}
+
+function preserveComparison(params: URLSearchParams) {
+  const vehicles = new URLSearchParams(window.location.search).get("vehicles");
+  if (vehicles) params.set("vehicles", vehicles);
 }

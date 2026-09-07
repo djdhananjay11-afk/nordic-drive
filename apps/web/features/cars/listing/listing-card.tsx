@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { Route } from "next";
 import type { ComponentType } from "react";
-import { BatteryCharging, Gauge, Snowflake, Zap } from "lucide-react";
+import { BatteryCharging, Gauge, Snowflake, Zap, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { GlassCard } from "@/components/ui/card";
@@ -24,6 +26,23 @@ export function ListingCard({
   index: number;
   locale: Locale;
 }) {
+  const router = useRouter();
+  const [limitReached, setLimitReached] = useState(false);
+
+  function addToComparison() {
+    const params = new URLSearchParams(window.location.search);
+    const selected = [...new Set((params.get("vehicles") ?? "").split(",").filter(Boolean))];
+    const key = `${car.brandSlug}:${car.modelSlug}`;
+    if (!selected.includes(key) && selected.length >= 4) {
+      setLimitReached(true);
+      return;
+    }
+    const vehicles = [...new Set([...selected, key])];
+    router.push(
+      `${localizePath(locale, "/compare")}?${new URLSearchParams({ vehicles: vehicles.join(",") })}` as Route,
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -65,6 +84,30 @@ export function ListingCard({
               </Link>
             </Button>
           </div>
+          <Button
+            className="mt-4 h-auto min-h-11 w-full whitespace-normal border border-slate-300 bg-white text-slate-950 hover:bg-slate-100"
+            onClick={addToComparison}
+            type="button"
+            variant="secondary"
+          >
+            <Plus aria-hidden="true" className="mr-2 size-4 shrink-0" />
+            {locale === "no" ? "Legg til sammenligning" : "Add to comparison"}
+          </Button>
+          {limitReached ? (
+            <p role="status" className="mt-2 text-sm text-slate-600">
+              {locale === "no"
+                ? "Maks 4 biler. Fjern en bil fra sammenligningen først."
+                : "Maximum 4 cars. Remove a car from your comparison first."}{" "}
+              <Link
+                className="underline"
+                href={
+                  `${localizePath(locale, "/compare")}?${new URLSearchParams({ vehicles: new URLSearchParams(window.location.search).get("vehicles") ?? "" })}` as Route
+                }
+              >
+                {locale === "no" ? "Se sammenligning" : "View comparison"}
+              </Link>
+            </p>
+          ) : null}
         </div>
       </GlassCard>
     </motion.div>

@@ -116,7 +116,20 @@ const localizedHomeContent: Record<
 };
 
 export function getHomeData(locale: Locale = defaultLocale) {
-  const featuredCars = nordicCars.slice(0, 6);
+  const featuredSlugs = [
+    "tesla:model-y-long-range",
+    "bmw:ix-xdrive50",
+    "volvo:ex30-single-motor-extended-range",
+    "hyundai:ioniq-5-awd",
+    "kia:ev9-gt-line-awd",
+    "porsche:macan-electric-4",
+  ];
+  const featuredCars = featuredSlugs
+    .map((key) => {
+      const [brandSlug, modelSlug] = key.split(":");
+      return nordicCars.find((car) => car.brandSlug === brandSlug && car.modelSlug === modelSlug);
+    })
+    .filter((car): car is (typeof nordicCars)[number] => Boolean(car));
   const brands = Array.from(new Set(nordicCars.map((car) => car.brand))).map((brand) => ({
     name: brand,
     slug: brand.toLowerCase().replace(/\s+/g, "-"),
