@@ -20,6 +20,9 @@
     "db:deploy": "pnpm --filter @nordicdrive/database prisma:deploy",
     "db:seed": "pnpm --filter @nordicdrive/database seed",
     "db:studio": "pnpm --filter @nordicdrive/database prisma:studio",
+    "catalog:check": "pnpm --filter @nordicdrive/database catalog:check",
+    "catalog:import": "pnpm --filter @nordicdrive/database catalog:import",
+    "catalog:test": "pnpm --filter @nordicdrive/database catalog:test",
     "vercel-build": "pnpm db:generate && turbo build --filter=@nordicdrive/web..."
   },
   "devDependencies": {

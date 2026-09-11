@@ -2,6 +2,10 @@
 
 Production-grade automotive comparison platform for Norway.
 
+## Official Catalogue Data
+
+The [official Norwegian catalogue import guide](docs/official-catalog-import.md) documents the partial source-backed data batch, offline validation and guarded Prisma import. Run `pnpm catalog:check` to see coverage. Database credentials, migration-history review, further specification verification and image permissions are still required; this does not replace the public static catalogue.
+
 ## Phase 1 Includes
 
 - Turborepo monorepo

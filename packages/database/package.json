@@ -21,7 +21,10 @@
     "prisma:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
     "prisma:reset": "prisma migrate reset --schema prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema prisma/schema.prisma",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "catalog:check": "tsx src/catalog/import-official.ts",
+    "catalog:import": "tsx src/catalog/import-official.ts --apply",
+    "catalog:test": "tsx --test src/catalog/plan.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1"
