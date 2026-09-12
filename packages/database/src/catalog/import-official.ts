@@ -2,21 +2,22 @@ import { existsSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import type { Prisma } from "@prisma/client";
-import { officialNorwayBatch } from "./batch-no-2026-09-11.js";
-import { canonicalJson, prepareImport, requireDatabaseTarget, summarizeBatch } from "./plan.js";
+import { prepareBatches, selectBatches, summarizeBatches } from "./batches.js";
+import { canonicalJson, requireDatabaseTarget } from "./plan.js";
 
 async function main(): Promise<void> {
   const { values } = parseArgs({
     options: {
       apply: { type: "boolean", default: false },
       target: { type: "string" },
+      batch: { type: "string", default: "all" },
     },
     strict: true,
     allowPositionals: false,
   });
-  const batch = officialNorwayBatch;
-  const rows = prepareImport(batch);
-  console.log(JSON.stringify(summarizeBatch(batch), null, 2));
+  const batches = selectBatches(values.batch);
+  const rows = prepareBatches(batches);
+  console.log(JSON.stringify(summarizeBatches(batches), null, 2));
   if (!values.apply) {
     console.log(
       `DRY RUN: ${rows.length} review rows validated. No database connection, downloads or public changes.`,

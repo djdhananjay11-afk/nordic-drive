@@ -7,7 +7,6 @@ import {
   Calendar,
   Gauge,
   Play,
-  ShieldCheck,
   Snowflake,
   Sparkles,
   Truck,
@@ -39,7 +38,7 @@ export function PremiumCarDetailPage({ car }: CarDetailPageProps) {
     .slice(0, 3);
 
   const specs = [
-    { icon: BatteryCharging, label: "WLTP range", value: `${car.rangeWltpKm} km`, detail: "official estimate" },
+    { icon: BatteryCharging, label: "WLTP range", value: `${car.rangeWltpKm} km`, detail: "pending source verification" },
     { icon: Snowflake, label: "Winter range", value: `${car.winterRangeKm} km`, detail: "Nordic estimate" },
     { icon: Zap, label: "10-80% charging", value: `${car.chargingMinutes} min`, detail: `${car.fastChargingKw} kW peak` },
     { icon: Gauge, label: "0-100 km/h", value: `${car.accelerationSeconds.toFixed(1)} s`, detail: car.drivetrain },
@@ -188,31 +187,10 @@ export function PremiumCarDetailPage({ car }: CarDetailPageProps) {
           </div>
 
           <div>
-            <SectionHeader eyebrow="Reviews" title="Expert and owner view" />
-            <div className="mt-5 grid gap-4">
-              {experience.reviews.map((review) => (
-                <GlassCard className="bg-white/78 p-6 shadow-sm" key={review.source}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-lg font-semibold text-slate-950">{review.source}</div>
-                      <p className="mt-3 text-sm leading-6 text-slate-500">{review.summary}</p>
-                    </div>
-                    <div className="rounded-md bg-slate-950 px-3 py-2 text-lg font-semibold text-white">{review.rating}</div>
-                  </div>
-                </GlassCard>
-              ))}
-              <GlassCard className="bg-white/78 p-6 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="size-5 text-slate-500" />
-                  <div>
-                    <div className="font-semibold text-slate-950">NordicDrive verified methodology</div>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Scores combine range, winter usability, charging, ownership cost, comfort, and safety.
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-            </div>
+            <SectionHeader eyebrow="Reviews" title="Independent reviews" />
+            <p className="mt-5 text-sm leading-6 text-slate-600">
+              No verified independent reviews are available for this configuration yet.
+            </p>
           </div>
         </div>
       </section>

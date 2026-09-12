@@ -23,6 +23,7 @@
     "catalog:check": "pnpm --filter @nordicdrive/database catalog:check",
     "catalog:import": "pnpm --filter @nordicdrive/database catalog:import",
     "catalog:test": "pnpm --filter @nordicdrive/database catalog:test",
+    "catalog:test-web": "pnpm --filter @nordicdrive/database exec tsx --tsconfig ../../apps/web/tsconfig.json --test ../../apps/web/lib/seo.test.ts",
     "vercel-build": "pnpm db:generate && turbo build --filter=@nordicdrive/web..."
   },
   "devDependencies": {

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import {
-  formatNok,
   getCarImageUrl,
   nordicCars,
   type NordicCar,
@@ -114,10 +113,10 @@ export function createPageMetadata({
 
 export function createCarMetadata(car: NordicCar): Metadata {
   return createPageMetadata({
-    description: `${car.tagline} Compare ${formatNok(car.priceNok)}, ${car.rangeWltpKm} km WLTP range, ${car.winterRangeKm} km winter estimate, charging, variants, and similar EVs in Norway.`,
+    description: `Explore ${car.brand} ${car.model} and compare electric vehicles in Norway. Catalogue specifications and prices are undergoing source verification.`,
     image: getCarImageUrl(car),
     path: `/cars/${car.brandSlug}/${car.modelSlug}`,
-    title: `${car.brand} ${car.model} 3D Review`,
+    title: `${car.brand} ${car.model} Overview`,
   });
 }
 
@@ -154,19 +153,11 @@ export function carJsonLd(car: NordicCar) {
       "@type": "Brand",
       name: car.brand,
     },
-    description: car.tagline,
+    description: `Information about ${car.brand} ${car.model}. Specifications pending verification.`,
     fuelType: "Electric",
     image: getCarImageUrl(car),
     name: `${car.brand} ${car.model}`,
-    offers: {
-      "@type": "Offer",
-      availability: "https://schema.org/InStock",
-      price: car.priceNok,
-      priceCurrency: "NOK",
-      url: absoluteUrl(`/cars/${car.brandSlug}/${car.modelSlug}`),
-    },
     url: absoluteUrl(`/cars/${car.brandSlug}/${car.modelSlug}`),
-    vehicleSeatingCapacity: car.seats,
   };
 }
 
@@ -183,7 +174,7 @@ export function carListJsonLd(cars = nordicCars) {
       },
       position: index + 1,
     })),
-    name: "Electric cars available in Norway",
+    name: "Electric vehicle catalogue for Norway",
   };
 }
 

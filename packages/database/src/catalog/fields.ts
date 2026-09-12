@@ -9,6 +9,7 @@ export const fieldUnits = {
   chargingAcKw: "kW",
   chargingDcPeakKw: "kW",
   charging10To80Minutes: "min",
+  charging20To80Minutes: "min",
   charging30To80Minutes: "min",
   consumptionWltpKwhPer100Km: "kWh/100km",
   powerKw: "kW",

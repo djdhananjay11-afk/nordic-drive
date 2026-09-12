@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { PremiumNav } from "@/components/design-system/premium-nav";
 import { WebVitalsReporter } from "@/components/monitoring/web-vitals-reporter";
 import { JsonLd } from "@/components/seo/json-ld";
+import { catalogueNotice } from "@/features/cars/data/catalogue-status";
 import { htmlLangByLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getRequestLocale } from "@/lib/i18n/server";
@@ -49,6 +50,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} id="nordicdrive-root-schema" />
         <WebVitalsReporter />
         <PremiumNav dictionary={dictionary.nav} locale={locale} />
+        <aside className="border-b border-amber-200 bg-amber-50 text-amber-950">
+          <p className="mx-auto max-w-7xl px-5 py-3 text-sm leading-6 sm:px-8">
+            {catalogueNotice[locale]}
+          </p>
+        </aside>
         {children}
       </body>
     </html>

@@ -1,12 +1,14 @@
 # Official Norwegian EV catalogue import
 
-Research observed on 2026-09-11. This is a **partial evidence batch**, not a complete, certified catalogue and not a completed database import.
+Research observed on 2026-09-11 and 2026-09-12. These are **partial evidence batches**, not a complete, certified catalogue and not a completed database import. Staging is the user-approved target; production is not authorized for this import.
 
 ## What is saved
 
-- 50 brand-source entries with coverage notes and extraction status.
-- 75 model/variant observations across 27 brands, containing 212 individual facts.
-- 11 official-site image URL candidates. None is approved for publication, verified as a current real photograph, downloaded or uploaded to storage.
+- 50 distinct brands in the source register, with coverage notes and extraction status.
+- September 11: 75 model/variant observations across 27 brands, containing 212 facts.
+- September 12: 21 additional observations across 10 more brands, containing 67 facts.
+- Combined: 96 observations across 37 brands, 279 facts, and 156 evidence rows including dated source observations. These are not 96 complete cars.
+- 12 official-site image URL candidates. None is approved for publication, verified as a current real photograph, downloaded or uploaded to storage.
 - Source URLs, observation dates, units, variant scope, starting-price/maximum/preliminary labels and unresolved conflicts.
 - An additive Prisma `CatalogEvidence` table, migration, dry-run validator, explicit database import command and regression tests.
 
@@ -20,6 +22,8 @@ No PostgreSQL credentials were configured when this work was performed. **No mig
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `packages/database/src/catalog/sources-no.ts`                                       | 50-source coverage register                             |
 | `packages/database/src/catalog/batch-no-2026-09-11.ts`                              | Source-linked factual observations and media candidates |
+| `packages/database/src/catalog/batch-no-2026-09-12.ts`                              | Second dated research batch, covering 10 more brands    |
+| `packages/database/src/catalog/batches.ts`                                          | Batch selection and distinct-brand coverage reporting   |
 | `packages/database/src/catalog/fields.ts`                                           | Measurement fields and units                            |
 | `packages/database/src/catalog/plan.ts`                                             | Validation, canonical hashes and target protection      |
 | `packages/database/src/catalog/import-official.ts`                                  | Offline dry run or explicit Prisma write                |
@@ -42,15 +46,18 @@ From the repository root:
 
 ```powershell
 pnpm catalog:check
+pnpm catalog:check --batch norway-official-2026-09-12-v1
 pnpm catalog:test
 pnpm --filter @nordicdrive/database typecheck
 ```
 
 Dry runs do not read credentials, connect to PostgreSQL, fetch websites, download files or modify public data. The dataset was manually extracted from official sources; the CLI is an evidence importer, **not an autonomous web crawler**.
 
+The default `--batch all` validates both batches. A full batch ID selects just that batch; unknown IDs fail before reading credentials. Each batch retains its own observation dates and original hashes. Coverage reporting counts distinct brands and lists brands without factual observations, not only extraction successes. CI now runs the dry run and regression tests.
+
 ## Configure the intended database
 
-Choose staging first. Put the intended Supabase `DATABASE_URL` and `DIRECT_URL` in `packages/database/.env`, following the local example. That file is ignored by Git. Do not put database passwords in chat, committed files, command-line arguments or `NEXT_PUBLIC_*` variables.
+Use the **staging** Supabase project selected by the user. Put its `DATABASE_URL` and `DIRECT_URL` in `packages/database/.env`, following the local example. That file is ignored by Git. Do not put database passwords in chat, committed files, command-line arguments or `NEXT_PUBLIC_*` variables. Do not substitute a production URL. The target check verifies connection identity, not whether a project is staging; confirm the project in Supabase first.
 
 The import loads only `packages/database/.env`, or uses an already exported `DATABASE_URL`. Existing process environment values take precedence. It does not load `apps/web/.env.local`. Automatic environment-file loading requires Node 20.12+; this workspace uses Node 20.20.2. Remote imports require `sslmode=require` or stronger.
 
@@ -78,9 +85,11 @@ The target argument is the **username, hostname, port and database from DATABASE
 
 ```powershell
 pnpm catalog:import --target "postgres.PROJECT@YOUR_POOLER_HOST:6543/postgres"
+# Or just the second batch, using the same confirmed staging identity:
+pnpm catalog:import --batch norway-official-2026-09-12-v1 --target "postgres.PROJECT@YOUR_POOLER_HOST:6543/postgres"
 ```
 
-After successful migration, this batch prepares 125 evidence rows: 50 source entries and 75 observations. `createMany` with a unique content hash skips unchanged duplicates. The console reports inserted and skipped counts; it never displays the connection string. All new rows remain pending. The command performs no `Car`/`Variant` updates, deletion, media copying, migration or demo seeding.
+After successful migration, both batches prepare 156 evidence rows: 60 dated source observations and 96 model/variant observations. The second batch alone prepares 31 rows. `createMany` with a unique content hash skips unchanged duplicates. The console reports inserted and skipped counts; it never displays the connection string. All new rows remain pending. The command performs no `Car`/`Variant` updates, deletion, media copying, migration or demo seeding.
 
 Do not run `pnpm db:seed` as a substitute: the existing seed contains example data, not this verified-source collection.
 
@@ -96,6 +105,20 @@ Do not run `pnpm db:seed` as a substitute: the existing seed contains example da
 - [Volkswagen's terms](https://www.volkswagen.no/no/om-oss/bruksvilkar.html) do not grant reuse rights to website imagery. No Volkswagen images were added for publication.
 
 Maserati and Mazda did not yield usable content. GWM/ORA Norwegian model availability remains unconfirmed; `gwm.no` is an unrelated business and Swedish-market prices must not be substituted. The 12 new-entry/status brands in the earlier checklist are outside this first batch.
+
+### September 12 follow-up
+
+Additional observations cover Citroen, CUPRA, firefly, Ford, MG, Opel, Peugeot, Renault, Toyota and XPENG. Key checks:
+
+- [Citroen e-C3](https://www.citroen.no/modeller/e-c3.html) and the [Peugeot E-3008 price/specification PDF](https://www.peugeot.no/content/dam/peugeot/norway/prislister-og-brosjyrer/personbiler/Kundeprisliste_E-3008_2026.pdf) report 20-80% charging. The dedicated `charging20To80Minutes` field prevents comparison with a different charging window.
+- [Opel's homepage](https://www.opel.no/) still displayed August-expired offers. No Opel starting price was collected in this batch; FWD and AWD cargo figures from the model page stay separate.
+- [Ford Mustang Mach-E](https://www.ford.no/biler/mustang-mach-e) yielded zero-valued animation counters. Those are not specifications. Its image candidate depicts GT, not the priced RWD version, and must not be used as that trim's photo.
+- [XPENG G6](https://www.xpeng.com/no/model/g6) and its linked Norwegian specification sheet disagree on AWD range. The batch withholds range and preserves the conflict for review.
+- [MG MGS5](https://www.mgmotor.eu/nn-NO/model/mgs5) provides usable Comfort cash-price and warranty footnotes, but most dynamic specifications were unavailable.
+
+Still without factual observations: Dongfeng, DS Automobiles, GWM/ORA, Hongqi, Jeep, Lexus, Maserati, Maxus, Mazda, Mercedes-Benz, MINI, Subaru and Voyah. Additional models and variants remain missing even for brands with observations.
+
+Local verification: 17 regression tests and the two-batch dry run passed. PostgreSQL migration execution, persisted idempotence and RLS integration remain unverified until staging credentials are configured.
 
 ## Norwegian customer data contract
 
@@ -118,7 +141,7 @@ Complete this checklist for each exact Norwegian configuration, with per-field s
 
 ## Publication work still required
 
-1. Finish model/variant and brochure extraction for every brand. This batch covers only 27 brands with factual observations, and does not contain every model for those brands.
+1. Finish model/variant and brochure extraction for every brand. These batches cover only 37 brands with factual observations, and do not contain every model for those brands.
 2. Resolve the flagged source conflicts, offers, option packages, exact model years and freshness. Obtain permitted structured feeds or manufacturer/importer confirmation where website extraction fails.
 3. Obtain documented editorial image permissions or a suitable licence. Inspect that each asset is a real photograph of the right generation/trim, then place approved files in durable storage/CDN. Public accessibility of an image URL is not approval; do not hotlink these candidates into cards.
 4. Build a reviewed promotion service mapping evidence to domain entities, supporting nullable unknowns and retaining provenance. Do not automatically derive one variant from unrelated model maxima/minima.

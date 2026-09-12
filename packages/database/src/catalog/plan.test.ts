@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { officialNorwayBatch } from "./batch-no-2026-09-11.js";
+import { officialNorwaySeptember12Batch } from "./batch-no-2026-09-12.js";
+import { officialNorwayFollowupBatch } from "./batch-no-2026-09-12-b.js";
+import { prepareBatches, selectBatches, summarizeBatches } from "./batches.js";
 import {
   canonicalJson,
   prepareImport,
@@ -168,4 +171,90 @@ test("database writes require an explicit matching project identity and TLS", ()
     ),
     "dev@localhost:5432/nordicdrive",
   );
+});
+
+test("batch selection fails closed and preserves historical rows and dates", () => {
+  const selected = selectBatches();
+  const combined = prepareBatches(selected);
+  const historical = prepareImport(officialNorwayBatch);
+  assert.deepEqual(combined.slice(0, historical.length), historical);
+  assert.equal(selectBatches(officialNorwayBatch.id)[0], officialNorwayBatch);
+  assert.deepEqual(prepareBatches(selected), combined);
+  assert.throws(() => selectBatches("latest-typo"), /Unknown batch/);
+  assert.throws(() => prepareBatches([]), /at least one/);
+  assert.throws(() => prepareBatches([officialNorwayBatch, officialNorwayBatch]), /duplicate/);
+  const newer = combined.filter((row) => row.batchId === officialNorwaySeptember12Batch.id);
+  assert.ok(newer.length > 0);
+  assert.ok(newer.every((row) => row.observedOn === "2026-09-12"));
+  assert.ok(historical.every((row) => row.observedOn === "2026-09-11"));
+});
+
+test("aggregate coverage counts distinct brands and reports remaining gaps", () => {
+  const summary = summarizeBatches(selectBatches());
+  assert.equal(summary.uniqueBrands, 50);
+  assert.equal(summary.brandsWithFacts, 48);
+  assert.equal(summary.brandsWithoutFacts.length, 2);
+  assert.equal(summary.imagesApproved, 0);
+  assert.equal(summary.publicCatalogueChanges, 0);
+  assert.equal(summary.batches.length, 3);
+});
+
+test("20-80 charging windows never populate 10-80 values", () => {
+  for (const brand of ["citroen", "peugeot"]) {
+    const record = officialNorwaySeptember12Batch.records.find(
+      (item) =>
+        item.brandSlug === brand &&
+        item.facts.some((fact) => fact.field === "charging20To80Minutes"),
+    );
+    assert.ok(record);
+    assert.equal(
+      record.facts.some((fact) => fact.field === "charging10To80Minutes"),
+      false,
+    );
+    assert.equal(record.facts.find((fact) => fact.field === "charging20To80Minutes")?.unit, "min");
+  }
+});
+
+test("conflicts, expired prices and failed counters stay absent", () => {
+  const records = officialNorwaySeptember12Batch.records;
+  for (const record of records.filter((item) => ["xpeng", "cupra"].includes(item.brandSlug))) {
+    assert.equal(
+      record.facts.some((fact) => fact.field === "rangeWltpCombinedKm"),
+      false,
+    );
+    assert.ok(record.warnings.length > 0);
+  }
+  for (const record of records.filter((item) => item.brandSlug === "opel")) {
+    assert.equal(
+      record.facts.some((fact) => fact.field === "priceFromNok"),
+      false,
+    );
+  }
+  const ford = records.find((item) => item.brandSlug === "ford");
+  assert.ok(ford);
+  assert.deepEqual(
+    ford.facts.map((fact) => fact.field),
+    ["priceFromNok"],
+  );
+  assert.equal(ford.media[0]?.rightsStatus, "UNVERIFIED");
+});
+
+test("new observations cannot bypass validation through combined imports", () => {
+  const invalid = structuredClone(officialNorwaySeptember12Batch);
+  first(first(invalid.records).facts).unit = "miles";
+  assert.throws(() => prepareBatches([officialNorwayBatch, invalid]), /Wrong unit/);
+});
+
+test("follow-up preserves cycle distinctions and excludes known conflicting facts", () => {
+  const records = officialNorwayFollowupBatch.records;
+  const maxus = records.find((record) => record.brandSlug === "maxus");
+  assert.equal(maxus?.facts.find((fact) => fact.field === "rangeWltpCombinedKm")?.value, 430);
+  assert.equal(maxus?.facts.find((fact) => fact.field === "rangeWltpCityKm")?.value, 565);
+  for (const record of records.filter((record) => ["dongfeng", "lexus", "voyah"].includes(record.brandSlug))) {
+    assert.equal(record.facts.some((fact) => fact.field === "rangeWltpCombinedKm"), false);
+  }
+  for (const record of records.filter((record) => ["subaru", "mercedes-benz", "mazda"].includes(record.brandSlug))) {
+    assert.equal(record.facts.some((fact) => fact.field === "priceFromNok"), false);
+  }
+  assert.ok(records.flatMap((record) => record.media).every((item) => item.rightsStatus === "UNVERIFIED"));
 });

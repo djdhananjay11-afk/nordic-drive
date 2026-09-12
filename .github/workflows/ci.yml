@@ -64,6 +64,15 @@ jobs:
       - name: Deploy migrations
         run: pnpm --filter @nordicdrive/database prisma:deploy
 
+      - name: Validate official catalogue evidence
+        run: pnpm catalog:check
+
+      - name: Test official catalogue safeguards
+        run: pnpm catalog:test
+
+      - name: Test public catalogue claims
+        run: pnpm catalog:test-web
+
       - name: Lint
         run: pnpm lint
 
