@@ -26,13 +26,18 @@ export function PremiumNav({
   className,
   dictionary,
   locale,
+  curated = false,
 }: {
   className?: string;
   dictionary: Dictionary["nav"];
   locale: Locale;
+  curated?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const visibleItems = curated
+    ? items.filter((item) => item.key === "cars" || item.key === "compare")
+    : items;
 
   return (
     <header
@@ -49,7 +54,7 @@ export function PremiumNav({
           NordicDrive
         </Link>
         <nav className="hidden items-center gap-3 text-sm font-semibold text-foreground/80 xl:flex">
-          {items.map((item) => (
+          {visibleItems.map((item) => (
             <Link
               className="rounded-md px-2 py-1 transition hover:bg-foreground/5 hover:text-foreground"
               href={localizePath(locale, item.href) as Route}
@@ -102,7 +107,7 @@ export function PremiumNav({
             >
               <DialogTitle>{dictionary.menu}</DialogTitle>
               <nav aria-label={dictionary.menu} className="grid gap-1">
-                {items.map((item) => {
+                {visibleItems.map((item) => {
                   const href = localizePath(locale, item.href);
                   return (
                     <Link
@@ -130,9 +135,12 @@ export function PremiumNav({
       </div>
       <nav
         aria-label={dictionary.menu}
-        className="grid grid-cols-3 border-t border-slate-100 px-3 xl:hidden"
+        className={cn(
+          "grid border-t border-slate-100 px-3 xl:hidden",
+          curated ? "grid-cols-2" : "grid-cols-3",
+        )}
       >
-        {items.slice(0, 3).map((item) => {
+        {visibleItems.slice(0, 3).map((item) => {
           const href = localizePath(locale, item.href);
           return (
             <Link

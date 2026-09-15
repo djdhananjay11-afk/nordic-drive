@@ -1,10 +1,29 @@
 import type { MetadataRoute } from "next";
+import { isCuratedRelease } from "@/features/catalogue/config";
+import { getCatalogue } from "@/features/catalogue/repository";
+import { vehiclePath } from "@nordicdrive/database/catalogue";
 
 import { nordicCars } from "@/features/cars/data/nordic-cars";
 import { locales, localizePath } from "@/lib/i18n/config";
 import { absoluteUrl } from "@/lib/seo";
+export const dynamic = "force-dynamic";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (isCuratedRelease()) {
+    const vehicles = await getCatalogue();
+    const checked = new Date("2026-09-12T00:00:00Z");
+    return [
+      ...["/", "/cars", "/electric-cars", "/compare", "/disclaimer"].flatMap((path) =>
+        localizedSitemapEntries(path, checked, 0.8, "weekly"),
+      ),
+      ...vehicles.flatMap((v) =>
+        localizedSitemapEntries(vehiclePath(v), new Date(v.checkedOn), 0.8, "weekly"),
+      ),
+      ...[...new Set(vehicles.map((v) => v.brandSlug))].flatMap((brand) =>
+        localizedSitemapEntries(`/brands/${brand}`, checked, 0.7, "weekly"),
+      ),
+    ];
+  }
   const now = new Date();
   const brands = Array.from(new Set(nordicCars.map((car) => car.brandSlug)));
   const staticPaths = [

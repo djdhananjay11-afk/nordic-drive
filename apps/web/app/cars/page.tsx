@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { isCuratedRelease } from "@/features/catalogue/config";
+import { CatalogueLanding } from "@/features/catalogue/pages";
+import { catalogueCopy } from "@/features/catalogue/copy";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { nordicCars } from "@/features/cars/data/nordic-cars";
@@ -16,7 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const dictionary = getDictionary(locale);
 
   return createPageMetadata({
-    description: dictionary.listing.cars.metaDescription,
+    description: isCuratedRelease()
+      ? catalogueCopy[locale].intro
+      : dictionary.listing.cars.metaDescription,
     locale,
     path: "/cars",
     title: dictionary.listing.cars.title,
@@ -28,6 +33,7 @@ type CarsPageProps = {
 };
 
 export default async function CarsPage({ searchParams }: CarsPageProps) {
+  if (isCuratedRelease()) return <CatalogueLanding params={await searchParams} />;
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const params = normalizeSearchParams(await searchParams);

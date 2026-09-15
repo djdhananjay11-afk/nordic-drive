@@ -6,6 +6,14 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./catalogue": {
+      "types": "./dist/catalog/release.d.ts",
+      "default": "./dist/catalog/release.js"
+    },
+    "./catalogue-plan": {
+      "types": "./dist/catalog/release-plan.d.ts",
+      "default": "./dist/catalog/release-plan.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
@@ -24,7 +32,8 @@
     "seed": "tsx prisma/seed.ts",
     "catalog:check": "tsx src/catalog/import-official.ts",
     "catalog:import": "tsx src/catalog/import-official.ts --apply",
-    "catalog:test": "tsx --test src/catalog/plan.test.ts"
+    "catalog:test": "tsx --test src/catalog/plan.test.ts src/catalog/release.test.ts",
+    "catalog:release": "tsx src/catalog/publish-release.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1"

@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { isCuratedRelease } from "@/features/catalogue/config";
+import { CatalogueLanding } from "@/features/catalogue/pages";
+import { getCatalogue } from "@/features/catalogue/repository";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { CarListingView } from "@/features/cars/listing/car-listing-view";
@@ -9,6 +13,7 @@ import { getRequestLocale } from "@/lib/i18n/server";
 import { breadcrumbJsonLd, carListJsonLd, createPageMetadata } from "@/lib/seo";
 
 export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 type BrandPageProps = {
   params: Promise<{ brand: string }>;
@@ -34,10 +39,16 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
 }
 
 export function generateStaticParams() {
+  if (isCuratedRelease()) return [];
   return Array.from(new Set(nordicCars.map((car) => car.brandSlug))).map((brand) => ({ brand }));
 }
 
 export default async function BrandPage({ params, searchParams }: BrandPageProps) {
+  if (isCuratedRelease()) {
+    const { brand } = await params;
+    if (!(await getCatalogue()).some((v) => v.brandSlug === brand)) notFound();
+    return <CatalogueLanding brand={brand} params={await searchParams} />;
+  }
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const { brand } = await params;

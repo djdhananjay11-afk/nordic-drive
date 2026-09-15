@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { isCuratedRelease } from "@/features/catalogue/config";
+import { CatalogueLanding } from "@/features/catalogue/pages";
+import { catalogueCopy } from "@/features/catalogue/copy";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { HomePageView } from "@/features/home/components/home-page-view";
@@ -14,7 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const dictionary = getDictionary(locale);
 
   return createPageMetadata({
-    description: dictionary.metadata.homeDescription,
+    description: isCuratedRelease()
+      ? catalogueCopy[locale].intro
+      : dictionary.metadata.homeDescription,
     locale,
     path: "/",
     title: dictionary.metadata.homeTitle,
@@ -22,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
+  if (isCuratedRelease()) return <CatalogueLanding home />;
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const data = getHomeData(locale);

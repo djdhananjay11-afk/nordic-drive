@@ -1,6 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalEnv": [
+    "NORDICDRIVE_RELEASE_MODE",
+    "NORDICDRIVE_CATALOGUE_SOURCE",
+    "NEXT_OUTPUT_STANDALONE",
     "AUTH_SECRET",
     "AUTH_URL",
     "DATABASE_URL",

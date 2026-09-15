@@ -1,1 +1,3 @@
-export { default } from "@nordicdrive/eslint-config/base";
+import base from "@nordicdrive/eslint-config/base";
+
+export default [{ ignores: ["dist/**"] }, ...base];

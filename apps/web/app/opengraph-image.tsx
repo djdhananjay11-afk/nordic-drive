@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { isCuratedRelease } from "@/features/catalogue/config";
 
 export const alt = "NordicDrive electric car comparison platform";
 export const contentType = "image/png";
@@ -9,6 +10,29 @@ export const size = {
 };
 
 export default function OpenGraphImage() {
+  if (isCuratedRelease())
+    return new ImageResponse(
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          width: "100%",
+          height: "100%",
+          background: "#fafafa",
+          color: "#18181b",
+          padding: 80,
+          gap: 30,
+        }}
+      >
+        <div style={{ display: "flex", fontSize: 72, fontWeight: 700 }}>NordicDrive</div>
+        <div style={{ display: "flex", fontSize: 34, color: "#065f46" }}>Elbiler i Norge</div>
+        <div style={{ display: "flex", fontSize: 28, color: "#52525b" }}>
+          Et lite, kildebasert utvalg. Priser, rekkevidde og lading.
+        </div>
+      </div>,
+      size,
+    );
   return new ImageResponse(
     <div
       style={{
@@ -63,12 +87,12 @@ export default function OpenGraphImage() {
       <div
         style={{
           display: "flex",
-            flexDirection: "column",
-            gap: 20,
-            maxWidth: 860,
-            textAlign: "center",
-          }}
-        >
+          flexDirection: "column",
+          gap: 20,
+          maxWidth: 860,
+          textAlign: "center",
+        }}
+      >
         <div
           style={{
             color: "#475569",
