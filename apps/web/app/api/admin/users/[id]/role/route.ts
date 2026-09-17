@@ -26,7 +26,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     await prisma.user.update({
       where: { id },
       data: { roleId: role.id },
-      include: { role: true },
+      select: { id: true, email: true, name: true, role: true },
     }),
   );
 }

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { AdminShell } from "@/components/admin/admin-shell";
 import { auth } from "@/lib/auth";
-import { isAdminRole } from "@/lib/rbac";
+import { isOwnerSession } from "@/lib/owner-policy";
 
 export const metadata: Metadata = {
   robots: {
@@ -20,7 +20,7 @@ export const revalidate = 0;
 export default async function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
   const session = await auth();
 
-  if (!isAdminRole(session?.user?.role)) {
+  if (!isOwnerSession(session)) {
     redirect("/login");
   }
 

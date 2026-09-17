@@ -116,6 +116,12 @@ enum ChargingPlugType {
   NACS
 }
 
+model LoginThrottle {
+  key      String   @id
+  attempts Int
+  resetAt  DateTime
+}
+
 model Role {
   id          String           @id @default(uuid()) @db.Uuid
   name        String

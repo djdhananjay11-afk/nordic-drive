@@ -80,7 +80,7 @@ export function CatalogueDetail({
         }}
       />
       <Link
-        href={localizePath(locale, "/cars") as Route}
+        href={localizePath(locale, "/verified-cars") as Route}
         className="inline-flex min-h-11 items-center text-sm text-emerald-800 underline"
       >
         {copy.back}
@@ -97,7 +97,7 @@ export function CatalogueDetail({
       <div className="my-8 flex flex-wrap gap-4">
         <Link
           className="inline-flex min-h-11 items-center rounded-md bg-emerald-800 px-5 font-semibold text-white"
-          href={localizePath(locale, `/compare?vehicles=${vehicle.id}`) as Route}
+          href={localizePath(locale, `/verified-compare?vehicles=${vehicle.id}`) as Route}
         >
           {copy.compare}
         </Link>
@@ -176,7 +176,7 @@ export async function CatalogueComparison({ params }: { params: CatalogueParams 
         href={
           localizePath(
             locale,
-            `/cars?vehicles=${encodeURIComponent(selected.map((v) => v.id).join(","))}`,
+            `/verified-cars?vehicles=${encodeURIComponent(selected.map((v) => v.id).join(","))}`,
           ) as Route
         }
         className="my-6 inline-flex min-h-11 items-center rounded-md bg-emerald-800 px-5 font-semibold text-white"
@@ -222,7 +222,7 @@ export async function CatalogueComparison({ params }: { params: CatalogueParams 
                       href={
                         localizePath(
                           locale,
-                          `/compare?vehicles=${selected
+                          `/verified-compare?vehicles=${selected
                             .filter((item) => item.id !== v.id)
                             .map((item) => item.id)
                             .join(",")}`,

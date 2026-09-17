@@ -2,7 +2,13 @@
 
 ## Scope and limitations
 
-The public default is now a small source-backed catalogue, not the legacy demo.
+This document describes the optional curated release. The default is now the
+full application (`NORDICDRIVE_RELEASE_MODE=full`), with the broader provisional
+catalogue and AI navigation restored. Source-reviewed database records remain
+available separately at `/no/verified-cars` and `/en/verified-cars`.
+See [completion status](completion-status.md) for current launch limitations.
+
+The curated release is a small source-backed catalogue, not the legacy demo.
 It contains Polestar 2 Long range Single motor and Hongqi EHS5 Exclusive 4WD,
 checked against their official Norwegian pages on 12 September 2026.
 These are manufacturer claims, not independently tested cars. Model years,
@@ -36,7 +42,7 @@ pnpm --filter @nordicdrive/database build
 pnpm --filter @nordicdrive/web dev
 ```
 
-Defaults (also documented in `apps/web/.env.example`):
+Explicit settings for the optional offline curated release:
 
 ```dotenv
 NORDICDRIVE_RELEASE_MODE=curated
@@ -47,7 +53,8 @@ Open `/no/cars`, select cars, then compare. Try English with the language
 switcher. Snapshot mode deliberately serves checked-in facts and requires no
 database connection for public catalogue browsing. It does not mean anything
 was inserted into PostgreSQL. Authentication/admin still need their own setup.
-Set `NORDICDRIVE_RELEASE_MODE=demo` only to inspect the old private demo.
+Set `NORDICDRIVE_RELEASE_MODE=full` to restore the full application. Its older
+catalogue is provisional and must not be presented as completely verified.
 
 On Windows, standalone packaging may require privileges to create symbolic
 links. The existing Vercel-compatible build option avoids standalone output:

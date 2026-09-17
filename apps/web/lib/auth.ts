@@ -1,83 +1,53 @@
 import NextAuth from "next-auth";
-import GitHub from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-
+import Credentials from "next-auth/providers/credentials";
+import { z } from "zod";
+import { passwordVersion, verifyPassword } from "@nordicdrive/database";
 import { prisma } from "@/lib/db";
-import { stripLocaleFromPathname } from "@/lib/i18n/config";
-import { isAdminRole, ROLE_PERMISSIONS } from "@/lib/rbac";
+import { authConfig } from "./auth-config";
+import { isOwnerEmail, ownerEmail } from "./owner-policy";
 
-const configuredAuthSecret =
-  process.env.AUTH_SECRET?.trim() || process.env.NEXTAUTH_SECRET?.trim() || undefined;
+const credentialsSchema = z.object({ email: z.string().trim().email().max(254), password: z.string().min(1).max(128) });
 
-export const githubAuthConfigured = Boolean(
-  process.env.AUTH_GITHUB_ID?.trim() && process.env.AUTH_GITHUB_SECRET?.trim(),
-);
-
-const authSecret =
-  configuredAuthSecret ??
-  (process.env.NODE_ENV !== "production"
-    ? "nordicdrive-local-development-secret-change-before-production"
-    : undefined);
+async function reserveLoginAttempt() {
+  // One persistent owner bucket prevents distributed/serverless password guessing.
+  const rows = await prisma.$queryRaw<Array<{ attempts: number }>>`
+    INSERT INTO "LoginThrottle" ("key", "attempts", "resetAt")
+    VALUES ('owner', 1, CURRENT_TIMESTAMP + INTERVAL '15 minutes')
+    ON CONFLICT ("key") DO UPDATE SET
+      "attempts" = CASE WHEN "LoginThrottle"."resetAt" <= CURRENT_TIMESTAMP THEN 1 ELSE LEAST("LoginThrottle"."attempts" + 1, 11) END,
+      "resetAt" = CASE WHEN "LoginThrottle"."resetAt" <= CURRENT_TIMESTAMP THEN CURRENT_TIMESTAMP + INTERVAL '15 minutes' ELSE "LoginThrottle"."resetAt" END
+    RETURNING "attempts"`;
+  return (rows[0]?.attempts ?? 11) <= 10;
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  ...(authSecret ? { secret: authSecret } : {}),
-  session: {
-    strategy: "jwt",
-    maxAge: 60 * 60 * 24 * 7,
-    updateAge: 60 * 15,
-  },
-  providers: githubAuthConfigured ? [
-    GitHub({
-      allowDangerousEmailAccountLinking: false,
-    }),
-  ] : [],
+  ...authConfig,
+  providers: [Credentials({
+    credentials: { email: { type: "email" }, password: { type: "password" } },
+    async authorize(input) {
+      const parsed = credentialsSchema.safeParse(input);
+      if (!parsed.success || !(await reserveLoginAttempt())) return null;
+      const user = await prisma.user.findUnique({ where: { email: ownerEmail() }, include: { role: true } });
+      const validPassword = await verifyPassword(parsed.data.password, user?.passwordHash ?? null);
+      if (!validPassword || !isOwnerEmail(parsed.data.email) || !user || user.deletedAt || user.role?.deletedAt || user.role?.slug !== "super_admin") return null;
+      return { id: user.id, email: user.email, name: user.name };
+    },
+  })],
   callbacks: {
-    async jwt({ token, user, account }) {
-      const email = user?.email ?? token.email;
-
-      if (email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email },
-          select: { id: true, role: { select: { slug: true } } },
-        });
-
-        if (dbUser?.id) {
-          token.sub = dbUser.id;
-        }
-        token.role = dbUser?.role?.slug ?? "user";
-        token.permissions =
-          ROLE_PERMISSIONS[token.role as keyof typeof ROLE_PERMISSIONS] ?? ROLE_PERMISSIONS.user;
-      }
-
-      if (account?.refresh_token) {
-        token.providerRefreshToken = account.refresh_token;
-      }
-
+    ...authConfig.callbacks,
+    async jwt({ token, user }) {
+      const id = user?.id ?? token.sub;
+      if (!id) return null;
+      const current = await prisma.user.findUnique({ where: { id }, include: { role: true } });
+      if (!current?.passwordHash || current.deletedAt || current.role?.deletedAt || current.role?.slug !== "super_admin" || !isOwnerEmail(current.email)) return null;
+      const version = passwordVersion(current.passwordHash);
+      if (!user && token.credentialVersion !== version) return null;
+      token.sub = current.id;
+      token.email = current.email;
+      token.role = "super_admin";
+      token.ownerAuthenticated = true;
+      token.credentialVersion = version;
       return token;
     },
-    session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub ?? "";
-        session.user.role = (token.role as string | undefined) ?? "user";
-        session.user.permissions =
-          (token.permissions as string[] | undefined) ?? ROLE_PERMISSIONS.user;
-      }
-
-      return session;
-    },
-    authorized({ auth, request }) {
-      const pathname = stripLocaleFromPathname(request.nextUrl.pathname);
-
-      if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-        return isAdminRole(auth?.user?.role);
-      }
-
-      return true;
-    },
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
   },
 });

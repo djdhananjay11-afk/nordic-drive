@@ -55,7 +55,7 @@ export function CatalogueBrowser({
   });
   const compareHref = localizePath(
     locale,
-    `/compare?vehicles=${encodeURIComponent(selected.join(","))}`,
+    `/verified-compare?vehicles=${encodeURIComponent(selected.join(","))}`,
   ) as Route;
   return (
     <>

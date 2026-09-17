@@ -11,3 +11,7 @@ coverage
 *.log
 Dockerfile.local
 tmp
+.venv/
+__pycache__/
+*.pyc
+tools/catalogue-scraper/runs/

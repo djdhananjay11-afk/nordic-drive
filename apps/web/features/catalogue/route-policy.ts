@@ -5,7 +5,9 @@ export function curatedRoutePolicy(path: string): "allow" | "unavailable" | "red
   if (path.startsWith("/api/")) return "unavailable";
   if (
     path === "/" ||
-    /^\/(cars|brands|compare|electric-cars|disclaimer|privacy|terms|auth|login)(\/|$)/.test(path)
+    /^\/(cars|brands|compare|verified-cars|verified-compare|electric-cars|disclaimer|privacy|terms|auth|login)(\/|$)/.test(
+      path,
+    )
   )
     return "allow";
   return "redirect";

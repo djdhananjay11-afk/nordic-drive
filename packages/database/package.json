@@ -21,6 +21,7 @@
     }
   },
   "scripts": {
+    "owner:setup": "tsx src/admin/setup-owner.ts",
     "build": "prisma generate && tsc",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -33,7 +34,8 @@
     "catalog:check": "tsx src/catalog/import-official.ts",
     "catalog:import": "tsx src/catalog/import-official.ts --apply",
     "catalog:test": "tsx --test src/catalog/plan.test.ts src/catalog/release.test.ts",
-    "catalog:release": "tsx src/catalog/publish-release.ts"
+    "catalog:release": "tsx src/catalog/publish-release.ts",
+    "catalog:initialize-staging": "tsx src/catalog/initialize-staging.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1"

@@ -1,0 +1,7 @@
+# Tested on Python 3.12.14. Refresh intentionally and rerun the test suite.
+beautifulsoup4==4.15.0
+psycopg[binary]==3.3.5
+pypdf==6.18.1
+soupsieve==2.9.2
+typing-extensions==4.16.0
+tzdata==2026.4; sys_platform == "win32"

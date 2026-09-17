@@ -5,6 +5,7 @@ export type CarMediaAsset = {
   representedModel?: string;
   sourceUrl?: string;
   url: string;
+  editorialPermission?: { sourceUrl: string; checkedOn: string; terms: string };
 };
 
 const teslaModelY: CarMediaAsset = {
@@ -85,6 +86,20 @@ const polestar5: CarMediaAsset = {
 };
 
 export const officialCarMedia: Record<string, CarMediaAsset> = {
+  "hyundai-ioniq-9-awd": {
+    match: "model-family",
+    provider: "manufacturer",
+    providerName: "Hyundai Motor",
+    representedModel: "IONIQ 9",
+    sourceUrl: "https://www.hyundai.news/es/modelos/eco/ioniq-9/imagenes.html",
+    url: "/official-photos/hyundai-ioniq-9-editorial.jpg",
+    editorialPermission: {
+      sourceUrl: "https://www.hyundai.news/es/modelos/eco/ioniq-9/imagenes.html",
+      checkedOn: "2026-09-16",
+      terms:
+        "Editorial use only, worldwide, perpetual. Not for advertisements or implied endorsement. International model photograph; Norwegian equipment may differ.",
+    },
+  },
   "tesla-model-y-long-range": teslaModelY,
   "tesla-model-3-long-range": teslaModel3,
   "tesla-model-s-dual-motor": teslaModelS,

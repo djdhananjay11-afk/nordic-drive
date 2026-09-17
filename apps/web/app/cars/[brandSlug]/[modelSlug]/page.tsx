@@ -34,7 +34,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: CarDetailRouteProps): Promise<Metadata> {
   const resolvedParams = await params;
-  if (isCuratedRelease()) {
+  if (isCuratedRelease() || !getCarBySlug(resolvedParams.brandSlug, resolvedParams.modelSlug)) {
     const vehicle = (await getCatalogue()).find(
       (v) => v.brandSlug === resolvedParams.brandSlug && v.slug === resolvedParams.modelSlug,
     );
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: CarDetailRouteProps): Promise
 
 export default async function CarDetailRoute({ params }: CarDetailRouteProps) {
   const resolvedParams = await params;
-  if (isCuratedRelease()) {
+  if (isCuratedRelease() || !getCarBySlug(resolvedParams.brandSlug, resolvedParams.modelSlug)) {
     const vehicle = (await getCatalogue()).find(
       (v) => v.brandSlug === resolvedParams.brandSlug && v.slug === resolvedParams.modelSlug,
     );

@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { ImageOff } from "lucide-react";
 
 import { getCarImageAsset, type NordicCar } from "@/features/cars/data/nordic-cars";
 import { getCarMediaMatchLabel } from "@/features/cars/data/official-car-media";
@@ -25,8 +27,10 @@ export function VehicleImage({
   priority = false,
   sizes = "(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
 }: VehicleImageProps) {
-  const [hasImageError, setHasImageError] = useState(false);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const norwegian = usePathname().startsWith("/no");
   const imageAsset = getCarImageAsset(car);
+  const hasImageError = failedUrl === imageAsset.url;
   const media = imageAsset.media;
   const matchLabel = getCarMediaMatchLabel(media);
   const missingLicensedMedia = !media && !car.imageUrl;
@@ -43,8 +47,7 @@ export function VehicleImage({
         className,
       )}
     >
-      <div className="absolute inset-x-8 bottom-7 h-16 rounded-[50%] bg-slate-950/15 blur-2xl" />
-      {!hasImageError ? (
+      {!hasImageError && !missingLicensedMedia ? (
         <Image
           alt={imageAlt}
           className={cn(
@@ -52,7 +55,7 @@ export function VehicleImage({
             imageClassName,
           )}
           fill
-          onError={() => setHasImageError(true)}
+          onError={() => setFailedUrl(imageAsset.url)}
           placeholder="blur"
           priority={priority}
           quality={82}
@@ -61,40 +64,29 @@ export function VehicleImage({
           src={imageAsset.url}
         />
       ) : (
-        <FallbackVehicleShape />
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-zinc-100 p-5 text-center text-zinc-600">
+          <ImageOff aria-hidden="true" className="size-7" />
+          <span className="text-sm font-medium">
+            {norwegian ? "Foto ikke tilgjengelig" : "Photo not available"}
+          </span>
+          <span className="text-xs">
+            {car.brand} {car.model}
+          </span>
+        </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-white/10" />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/14 to-transparent" />
       {matchLabel && !hasImageError ? (
         <span className="absolute bottom-2 left-2 max-w-[46%] truncate rounded bg-slate-950/70 px-2 py-1 text-[10px] font-semibold text-white shadow-sm backdrop-blur">
           {matchLabel}
         </span>
       ) : null}
-      {missingLicensedMedia ? (
-        <span className="absolute bottom-2 right-2 max-w-[52%] truncate rounded bg-white/85 px-2 py-1 text-[10px] font-semibold text-slate-600 shadow-sm backdrop-blur">
-          Add CMS media
-        </span>
-      ) : null}
       {media && !hasImageError ? (
         <span
-          className="absolute bottom-2 right-2 max-w-[46%] truncate rounded bg-white/80 px-2 py-1 text-[10px] font-medium text-slate-600 opacity-80 shadow-sm backdrop-blur transition sm:opacity-0 sm:group-hover:opacity-100"
+          className="absolute bottom-2 right-2 max-w-[46%] truncate rounded bg-white/90 px-2 py-1 text-[10px] font-medium text-slate-700 shadow-sm"
           title={`${media.providerName}${media.sourceUrl ? ` / ${media.sourceUrl}` : ""}`}
         >
           {media.providerName}
         </span>
       ) : null}
     </div>
-  );
-}
-
-function FallbackVehicleShape() {
-  return (
-    <>
-      <div className="absolute inset-x-8 bottom-14 h-12 rounded-t-[70px] border border-white/80 bg-white/76 shadow-xl" />
-      <div className="absolute left-[36%] right-[38%] bottom-[92px] h-10 rounded-t-[70px] border border-white/80 bg-white/88" />
-      <div className="absolute bottom-9 left-12 size-12 rounded-full border-[8px] border-slate-950 bg-slate-200" />
-      <div className="absolute bottom-9 right-12 size-12 rounded-full border-[8px] border-slate-950 bg-slate-200" />
-      <div className="absolute inset-x-6 bottom-8 h-px bg-gradient-to-r from-transparent via-slate-400/80 to-transparent" />
-    </>
   );
 }

@@ -4,6 +4,7 @@ import { generateOpenAIJson } from "@/features/ai/server/openai-client";
 
 export const searchIntentSchema = z.object({
   budgetMaxNok: z.number().int().positive().optional(),
+  budgetMonthlyMaxNok: z.number().int().positive().optional(),
   minRangeKm: z.number().int().positive().optional(),
   minSeats: z.number().int().positive().optional(),
   bodyType: z.enum(["SUV", "Sedan", "Crossover", "Wagon"]).optional(),
@@ -28,15 +29,20 @@ export async function parseSearchIntent(query: string): Promise<SearchIntent> {
       maxOutputTokens: 500,
       system:
         "You parse Norwegian EV shopping requests into strict JSON filters. Extract explicit constraints only. Keep booleans true when intent is strongly implied. Treat best offer, deal, value, cheap, affordable, monthly payment, kampanje, tilbud, billig, prisgunstig as preferValue.",
-      user: `Parse this NordicDrive EV request: ${query}\nSchema keys: budgetMaxNok, minRangeKm, minSeats, bodyType, preferFastCharging, preferLongRange, preferFamily, preferLuxury, preferPerformance, preferTowing, preferValue, preferWinter, query.`,
+      user: `Parse this NordicDrive EV request: ${query}\nSchema keys: budgetMaxNok, budgetMonthlyMaxNok, minRangeKm, minSeats, bodyType, preferFastCharging, preferLongRange, preferFamily, preferLuxury, preferPerformance, preferTowing, preferValue, preferWinter, query. Distinguish monthly payment limits from total purchase budgets. Do not infer live offers.`,
     },
     fallback,
   ).then((intent) => searchIntentSchema.catch(fallback).parse({ ...fallback, ...intent, query }));
 }
 
-function parseSearchIntentLocally(query: string): SearchIntent {
+export function parseSearchIntentLocally(query: string): SearchIntent {
   const normalizedQuery = query.toLowerCase();
-  const budgetMaxNok = extractBudget(normalizedQuery);
+  const monthlyBudget = /monthly|per month|a month|\/month|per mnd|\/mnd|måned|maaned/.test(
+    normalizedQuery,
+  );
+  const budget = extractBudget(normalizedQuery);
+  const budgetMaxNok = monthlyBudget ? undefined : budget;
+  const budgetMonthlyMaxNok = monthlyBudget ? budget : undefined;
   const minRangeKm = extractRange(normalizedQuery);
   const preferFamily = /family|familie|children|kids|barn|7 seat|seven seat|sju/.test(
     normalizedQuery,
@@ -58,6 +64,7 @@ function parseSearchIntentLocally(query: string): SearchIntent {
 
   return {
     budgetMaxNok,
+    budgetMonthlyMaxNok,
     bodyType,
     minRangeKm,
     minSeats,
@@ -75,21 +82,23 @@ function parseSearchIntentLocally(query: string): SearchIntent {
 
 function extractBudget(query: string) {
   const underMatch = query.match(
-    /(?:under|below|max|budget|less than|under|budsjett|maks|under)\s*(\d[\d\s.]*)\s*(?:nok|kr|k)?/,
+    /(?:under|below|max|budget|less than|budsjett|maks)\s*(\d[\d\s.,]*?)\s*(nok|kr|k(?!m)|(?=$|[a-zæøå]))/,
   );
-  const nokMatch = query.match(/(\d[\d\s.]*)\s*(?:nok|kr)/);
+  const nokMatch = query.match(/(\d[\d\s.,]*)\s*(nok|kr)/);
   const raw = underMatch?.[1] ?? nokMatch?.[1];
 
   if (!raw) {
     return undefined;
   }
 
-  const value = Number(raw.replace(/[\s.]/g, ""));
+  const value = Number(raw.replace(/[\s.,]/g, ""));
   if (!Number.isFinite(value)) {
     return undefined;
   }
 
-  return value < 10000 ? value * 1000 : value;
+  if (underMatch && /^\s*km\b/.test(query.slice(underMatch.index! + underMatch[0].length)))
+    return undefined;
+  return underMatch?.[2] === "k" ? value * 1000 : value;
 }
 
 function extractRange(query: string) {

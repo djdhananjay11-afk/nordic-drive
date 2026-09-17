@@ -6,6 +6,7 @@ declare module "next-auth" {
       id: string;
       role: string;
       permissions: string[];
+      ownerAuthenticated: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -15,5 +16,7 @@ declare module "next-auth/jwt" {
     role?: string;
     permissions?: string[];
     providerRefreshToken?: string;
+    ownerAuthenticated?: boolean;
+    credentialVersion?: string;
   }
 }

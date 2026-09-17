@@ -3,6 +3,7 @@ import { getVehicleDocuments } from "@/features/ai/server/vehicle-documents";
 import { parseSearchIntent, type SearchIntent } from "@/features/ai/server/search-parser";
 import { generateOpenAIJson } from "@/features/ai/server/openai-client";
 import { formatNok, getEfficiencyScore } from "@/features/cars/data/nordic-cars";
+import { matchesSearchConstraints } from "./search-constraints";
 
 export type AIRecommendation = {
   key: string;
@@ -28,13 +29,14 @@ export type AIRecommendationResult = {
 
 export async function recommendVehicles(query: string, limit = 4): Promise<AIRecommendationResult> {
   const intent = await parseSearchIntent(query);
-  const semanticResults = await semanticVehicleSearch(query, 8);
+  const semanticResults = await semanticVehicleSearch(query, 8, intent);
   const documents = getVehicleDocuments();
   const semanticScoreByKey = new Map(
     semanticResults.map((result) => [result.document.id, result.score]),
   );
 
   const recommendations = documents
+    .filter((document) => matchesSearchConstraints(intent, document.car))
     .map((document) => {
       const car = document.car;
       const constraintPenalty = getConstraintPenalty(intent, car);

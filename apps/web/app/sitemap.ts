@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   }
   const now = new Date();
+  const reviewed = await getCatalogue();
   const brands = Array.from(new Set(nordicCars.map((car) => car.brandSlug)));
   const staticPaths = [
     { changeFrequency: "daily" as const, path: "/", priority: 1 },
@@ -46,6 +47,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...brands.flatMap((brand) => localizedSitemapEntries(`/brands/${brand}`, now, 0.82, "daily")),
     ...nordicCars.flatMap((car) =>
       localizedSitemapEntries(`/cars/${car.brandSlug}/${car.modelSlug}`, now, 0.86, "weekly"),
+    ),
+    ...localizedSitemapEntries("/verified-cars", now, 0.85, "weekly"),
+    ...reviewed.flatMap((vehicle) =>
+      localizedSitemapEntries(vehiclePath(vehicle), new Date(vehicle.checkedOn), 0.85, "weekly"),
     ),
   ];
 }

@@ -9,6 +9,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
+    "owner:setup": "pnpm --filter @nordicdrive/database owner:setup",
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
@@ -21,11 +22,13 @@
     "db:seed": "pnpm --filter @nordicdrive/database seed",
     "db:studio": "pnpm --filter @nordicdrive/database prisma:studio",
     "catalog:check": "pnpm --filter @nordicdrive/database catalog:check",
+    "catalog:scraper-sources": "pnpm --filter @nordicdrive/database exec tsx src/catalog/export-crawl-sources.ts",
     "catalog:release": "pnpm --filter @nordicdrive/database catalog:release",
     "catalog:test-http": "pnpm --filter @nordicdrive/database exec tsx --test src/catalog/web-smoke.test.ts",
     "catalog:import": "pnpm --filter @nordicdrive/database catalog:import",
     "catalog:test": "pnpm --filter @nordicdrive/database catalog:test",
     "catalog:test-web": "pnpm --filter @nordicdrive/database exec tsx --tsconfig ../../apps/web/tsconfig.json --test ../../apps/web/lib/seo.test.ts ../../apps/web/features/catalogue/route-policy.test.ts",
+    "catalog:test-publications": "pnpm --filter @nordicdrive/database exec tsx --tsconfig ../../apps/web/tsconfig.json --test ../../apps/web/features/catalogue/validate-publication.test.ts ../../apps/web/features/ai/server/search-constraints.test.ts",
     "vercel-build": "pnpm db:generate && turbo build --filter=@nordicdrive/web..."
   },
   "devDependencies": {

@@ -1,20 +1,25 @@
-import { apiData, parseJson, requireAdminPermission } from "@/lib/admin/route-helpers";
-import { carSchema } from "@/lib/admin/validators";
-import { createAdminCar, listAdminCars } from "@/lib/admin/services";
+import { apiData, requireAdminPermission } from "@/lib/admin/route-helpers";
+import { carSaveSchema } from "@/lib/admin/car-schema";
+import { getCarInventory, saveAdminCar } from "@/lib/admin/car-service";
+import { adminError, readEditorJson } from "@/lib/admin/http";
+import { z } from "zod";
 
-export async function GET() {
-  const authResult = await requireAdminPermission("read", "car");
-  if ("error" in authResult) return authResult.error;
-
-  return apiData(await listAdminCars());
+export const runtime = "nodejs";
+export async function GET(request: Request) {
+  const result = await requireAdminPermission("read", "car");
+  if ("error" in result) return result.error;
+  try {
+    const url = new URL(request.url);
+    const query = z.string().max(120).parse(url.searchParams.get("q") ?? "");
+    const page = z.coerce.number().int().min(1).max(10000).parse(url.searchParams.get("page") ?? 1);
+    return apiData(await getCarInventory(query, page), { headers: { "Cache-Control": "no-store" } });
+  } catch (error) { return adminError(error); }
 }
-
 export async function POST(request: Request) {
-  const authResult = await requireAdminPermission("create", "car");
-  if ("error" in authResult) return authResult.error;
-
-  const parsed = await parseJson(request, carSchema);
-  if ("error" in parsed) return parsed.error;
-
-  return apiData(await createAdminCar(parsed.data), { status: 201 });
+  const result = await requireAdminPermission("create", "car");
+  if ("error" in result) return result.error;
+  try {
+    const input = carSaveSchema.parse(await readEditorJson(request));
+    return apiData(await saveAdminCar(input), { status: 201, headers: { "Cache-Control": "no-store" } });
+  } catch (error) { return adminError(error); }
 }

@@ -4,6 +4,10 @@ Production-grade automotive comparison platform for Norway.
 
 ## Official Catalogue Data
 
+The [staging database setup record](docs/staging-database-setup.md) lists the initialized schema, imported evidence, security checks and remaining publication work.
+
+The [Python official-site scraper](tools/catalogue-scraper/README.md) crawls the configured Norwegian brand sources, preserves specification evidence and supports guarded staging imports into `CatalogEvidence`. It does not automatically publish scraped claims or images. Setup, bounded crawling, reports and database instructions are in its guide.
+
 The [official Norwegian catalogue import guide](docs/official-catalog-import.md) documents the partial source-backed data batch, offline validation and guarded Prisma import. Run `pnpm catalog:check` to see coverage. Database credentials, migration-history review, further specification verification and image permissions are still required; this does not replace the public static catalogue.
 
 ## Phase 1 Includes

@@ -1,0 +1,777 @@
+[
+  {
+    "slug": "alfa-romeo",
+    "name": "Alfa Romeo",
+    "enabled": true,
+    "allowedHosts": [
+      "www.alfaromeo.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.alfaromeo.no/"
+    ],
+    "notes": "Junior electric offer observed; exact trim brochure pending."
+  },
+  {
+    "slug": "alpine",
+    "name": "Alpine",
+    "enabled": true,
+    "allowedHosts": [
+      "www.alpinecars.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.alpinecars.no/biler"
+    ],
+    "notes": "A290 and A390 offers observed."
+  },
+  {
+    "slug": "audi",
+    "name": "Audi",
+    "enabled": true,
+    "allowedHosts": [
+      "www.audi.no"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.audi.no/no/bilmodeller/",
+      "https://www.audi.no/no/bilmodeller/q6-e-tron/q6-e-tron/"
+    ],
+    "notes": "A6 e-tron, Q4 e-tron, Q6 e-tron and e-tron GT families; concepts and combustion models excluded from discovery."
+  },
+  {
+    "slug": "bmw",
+    "name": "BMW",
+    "enabled": true,
+    "allowedHosts": [
+      "www.bmw.no"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.bmw.no/no/elbil.html"
+    ],
+    "notes": "Electric catalogue and variant WLTP footnotes read; some new-model figures preliminary."
+  },
+  {
+    "slug": "byd",
+    "name": "BYD",
+    "enabled": true,
+    "allowedHosts": [
+      "byd.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://byd.no/",
+      "https://byd.no/modeller/sealion7"
+    ],
+    "notes": "Norwegian importer catalogue and Sealion 7 specifications read; confirm exact variants and price lists."
+  },
+  {
+    "slug": "changan",
+    "name": "Changan / Deepal",
+    "enabled": true,
+    "allowedHosts": [
+      "www.changaneurope.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.changaneurope.com/no/"
+    ],
+    "notes": "Deepal S05 and S07 observed."
+  },
+  {
+    "slug": "citroen",
+    "name": "Citroen",
+    "enabled": true,
+    "allowedHosts": [
+      "www.citroen.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.citroen.no/",
+      "https://www.citroen.no/modeller/e-c3.html"
+    ],
+    "notes": "Homepage retrieved; full model and variant extraction pending."
+  },
+  {
+    "slug": "cupra",
+    "name": "Cupra",
+    "enabled": true,
+    "allowedHosts": [
+      "www.cupraofficial.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.cupraofficial.no/",
+      "https://www.cupraofficial.no/elbiler/tavascan"
+    ],
+    "notes": "Homepage retrieved; full model and variant extraction pending."
+  },
+  {
+    "slug": "dongfeng",
+    "name": "Dongfeng",
+    "enabled": true,
+    "allowedHosts": [
+      "www.dong-feng.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.dong-feng.no/",
+      "https://www.dong-feng.no/box/spesifikasjoner",
+      "https://www.dong-feng.no/box"
+    ],
+    "notes": "BOX and VIGO observed; VIGO displays conflicting starting prices."
+  },
+  {
+    "slug": "ds",
+    "name": "DS Automobiles",
+    "enabled": true,
+    "allowedHosts": [
+      "www.dsautomobiles.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.dsautomobiles.no/"
+    ],
+    "notes": "DS3 E-TENSE observed; dated tax copy requires current price-list confirmation."
+  },
+  {
+    "slug": "fiat",
+    "name": "Fiat",
+    "enabled": true,
+    "allowedHosts": [
+      "www.fiat.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.fiat.no/"
+    ],
+    "notes": "Grande Panda electric, 600e and 500e observed; separate passenger and commercial vans."
+  },
+  {
+    "slug": "firefly",
+    "name": "firefly",
+    "enabled": true,
+    "allowedHosts": [
+      "www.firefly.world"
+    ],
+    "pathPrefixes": [
+      "/no_NO"
+    ],
+    "seedUrls": [
+      "https://www.firefly.world/no_NO",
+      "https://www.firefly.world/no_NO/firefly"
+    ],
+    "notes": "Norwegian product site; detailed specs pending."
+  },
+  {
+    "slug": "ford",
+    "name": "Ford",
+    "enabled": true,
+    "allowedHosts": [
+      "www.ford.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.ford.no/",
+      "https://www.ford.no/biler/mustang-mach-e"
+    ],
+    "notes": "Homepage retrieved; full model and variant extraction pending."
+  },
+  {
+    "slug": "gwm",
+    "name": "GWM / ORA",
+    "enabled": false,
+    "allowedHosts": [
+      "www.gwm-global.com"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.gwm-global.com/brands.html"
+    ],
+    "notes": "Norway in global territory list does not verify local offers. gwm.no is an unrelated investment company. Do not use Swedish prices/specs."
+  },
+  {
+    "slug": "honda",
+    "name": "Honda",
+    "enabled": true,
+    "allowedHosts": [
+      "www.honda.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.honda.no/cars.html"
+    ],
+    "notes": "e:Ny1 offer observed; exclude hybrid range."
+  },
+  {
+    "slug": "hongqi",
+    "name": "Hongqi",
+    "enabled": true,
+    "allowedHosts": [
+      "hongqi.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://hongqi.no/",
+      "https://hongqi.no/biler/ehs5/spesifikasjoner/"
+    ],
+    "notes": "Homepage retrieved; full model and variant extraction pending."
+  },
+  {
+    "slug": "hyundai",
+    "name": "Hyundai",
+    "enabled": true,
+    "allowedHosts": [
+      "www.hyundai.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.hyundai.com/no/no"
+    ],
+    "notes": "WLTP footnotes read; IONIQ 3 figures explicitly preliminary."
+  },
+  {
+    "slug": "jac",
+    "name": "JAC",
+    "enabled": true,
+    "allowedHosts": [
+      "jacmotors.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://jacmotors.no/modeller/e30x"
+    ],
+    "notes": "E30X variant table read; battery, dimensions and weights contain conflicts. Brochure cross-check required."
+  },
+  {
+    "slug": "jeep",
+    "name": "Jeep",
+    "enabled": true,
+    "allowedHosts": [
+      "www.jeep.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.jeep.com/no/",
+      "https://www.jeep.com/no/modeller/jeep-avenger/elektrisk.html"
+    ],
+    "notes": "Norwegian homepage retrieved; exact BEV variants pending."
+  },
+  {
+    "slug": "kgm",
+    "name": "KGM",
+    "enabled": true,
+    "allowedHosts": [
+      "kgm-auto.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://kgm-auto.no/modeller/torres-evx"
+    ],
+    "notes": "Torres EVX specifications and linked Norwegian price PDF inspected; boot/payload conflicts flagged."
+  },
+  {
+    "slug": "kia",
+    "name": "Kia",
+    "enabled": true,
+    "allowedHosts": [
+      "www.kia.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.kia.no/",
+      "https://www.kia.no/bil/ev9"
+    ],
+    "notes": "Current importer lists EV2/3/4/5/6/9 and passenger PV5. EV9 details read; kia.com/no content was less current."
+  },
+  {
+    "slug": "lexus",
+    "name": "Lexus",
+    "enabled": true,
+    "allowedHosts": [
+      "www.lexus.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.lexus.no/",
+      "https://www.lexus.no/new-cars/rz/overview"
+    ],
+    "notes": "RZ500e AWD Luxury offer observed; expiry and price basis pending. ES/TZ require powertrain and availability checks."
+  },
+  {
+    "slug": "lotus",
+    "name": "Lotus",
+    "enabled": true,
+    "allowedHosts": [
+      "www.lotuscars.com"
+    ],
+    "pathPrefixes": [
+      "/nb-NO"
+    ],
+    "seedUrls": [
+      "https://www.lotuscars.com/nb-NO"
+    ],
+    "notes": "Eletre BEV and Emeya starting prices. Exclude hybrid Eletre X."
+  },
+  {
+    "slug": "lucid",
+    "name": "Lucid",
+    "enabled": true,
+    "allowedHosts": [
+      "lucidmotors.com"
+    ],
+    "pathPrefixes": [
+      "/nb-no"
+    ],
+    "seedUrls": [
+      "https://lucidmotors.com/nb-no"
+    ],
+    "notes": "Air named-variant prices observed; Gravity details pending."
+  },
+  {
+    "slug": "maserati",
+    "name": "Maserati",
+    "enabled": true,
+    "allowedHosts": [
+      "www.maserati.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.maserati.com/no/no/models"
+    ],
+    "notes": "Official page fetch failed; no specifications accepted."
+  },
+  {
+    "slug": "maxus",
+    "name": "Maxus",
+    "enabled": true,
+    "allowedHosts": [
+      "maxus.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://maxus.no/",
+      "https://maxus.no/modeller/mifa-9"
+    ],
+    "notes": "Homepage retrieved; distinguish passenger MPVs from commercial-only vehicles."
+  },
+  {
+    "slug": "mazda",
+    "name": "Mazda",
+    "enabled": true,
+    "allowedHosts": [
+      "www.mazda.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.mazda.no/modeller/"
+    ],
+    "notes": "Page returned no extractable content; no specifications accepted."
+  },
+  {
+    "slug": "mercedes-benz",
+    "name": "Mercedes-Benz",
+    "enabled": true,
+    "allowedHosts": [
+      "www.mercedes-benz.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.mercedes-benz.no/"
+    ],
+    "notes": "Homepage retrieved after model page failed; detailed model extraction pending."
+  },
+  {
+    "slug": "mg",
+    "name": "MG",
+    "enabled": true,
+    "allowedHosts": [
+      "www.mgmotor.eu"
+    ],
+    "pathPrefixes": [
+      "/nn-NO"
+    ],
+    "seedUrls": [
+      "https://www.mgmotor.eu/nn-NO/",
+      "https://www.mgmotor.eu/nn-NO/model/mgs5"
+    ],
+    "notes": "MG4, MGS5 EV, MGS6 EV, IM5, IM6 and Cyberster observed; use the actual nn-NO site locale."
+  },
+  {
+    "slug": "mini",
+    "name": "MINI",
+    "enabled": true,
+    "allowedHosts": [
+      "www.mini.no"
+    ],
+    "pathPrefixes": [
+      "/no_NO"
+    ],
+    "seedUrls": [
+      "https://www.mini.no/no_NO/home.html"
+    ],
+    "notes": "Electric Cooper, Aceman and Countryman; keep combustion siblings separate."
+  },
+  {
+    "slug": "mitsubishi",
+    "name": "Mitsubishi",
+    "enabled": true,
+    "allowedHosts": [
+      "www.mitsubishi-motors.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.mitsubishi-motors.no/"
+    ],
+    "notes": "Eclipse Cross EV observed; do not confuse with older PHEV or Outlander PHEV."
+  },
+  {
+    "slug": "nio",
+    "name": "NIO",
+    "enabled": true,
+    "allowedHosts": [
+      "www.nio.com"
+    ],
+    "pathPrefixes": [
+      "/no_NO"
+    ],
+    "seedUrls": [
+      "https://www.nio.com/no_NO",
+      "https://www.nio.com/no_NO/el6"
+    ],
+    "notes": "Homepage retrieved; battery ownership versus subscription pricing must be separated."
+  },
+  {
+    "slug": "nissan",
+    "name": "Nissan",
+    "enabled": true,
+    "allowedHosts": [
+      "www.nissan.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.nissan.no/"
+    ],
+    "notes": "New LEAF and MICRA starting prices and maximum ranges; ARIYA also listed. Do not mix old/new generations."
+  },
+  {
+    "slug": "opel",
+    "name": "Opel",
+    "enabled": true,
+    "allowedHosts": [
+      "www.opel.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.opel.no/",
+      "https://www.opel.no/personbil/grandland-modeller/grandland-electric/grandland-electric.html"
+    ],
+    "notes": "Homepage retrieved; full model and variant extraction pending."
+  },
+  {
+    "slug": "peugeot",
+    "name": "Peugeot",
+    "enabled": true,
+    "allowedHosts": [
+      "www.peugeot.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.peugeot.no/",
+      "https://www.peugeot.no/content/dam/peugeot/norway/prislister-og-brosjyrer/personbiler/Kundeprisliste_E-3008_2026.pdf"
+    ],
+    "notes": "Homepage retrieved; full model and variant extraction pending."
+  },
+  {
+    "slug": "polestar",
+    "name": "Polestar",
+    "enabled": true,
+    "allowedHosts": [
+      "www.polestar.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.polestar.com/no/",
+      "https://www.polestar.com/no/polestar-2/specifications"
+    ],
+    "notes": "Homepage retrieved; exact model-year, variant and option package verification pending."
+  },
+  {
+    "slug": "porsche",
+    "name": "Porsche",
+    "enabled": true,
+    "allowedHosts": [
+      "www.porsche.com"
+    ],
+    "pathPrefixes": [
+      "/norway"
+    ],
+    "seedUrls": [
+      "https://www.porsche.com/norway/no/",
+      "https://www.porsche.com/norway/no/models/taycan/taycan-models/taycan-4/"
+    ],
+    "notes": "Homepage retrieved; exact Taycan, Macan and other BEV configurations pending."
+  },
+  {
+    "slug": "renault",
+    "name": "Renault",
+    "enabled": true,
+    "allowedHosts": [
+      "www.renault.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.renault.no/",
+      "https://www.renault.no/personbil"
+    ],
+    "notes": "Renault 4 order page observed; new Megane announced for 2027. Manufacturer says some backgrounds are AI-edited; photos need visual review."
+  },
+  {
+    "slug": "seres",
+    "name": "Seres",
+    "enabled": true,
+    "allowedHosts": [
+      "seresnorge.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://seresnorge.no/"
+    ],
+    "notes": "Seres 5 dimensions observed; current variant detail page pending."
+  },
+  {
+    "slug": "skoda",
+    "name": "Skoda",
+    "enabled": true,
+    "allowedHosts": [
+      "www.skoda-auto.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.skoda-auto.no/elbiler"
+    ],
+    "notes": "Enyaq, Enyaq Coupe, Elroq, Epiq and Peaq described; exact order status and brochures pending."
+  },
+  {
+    "slug": "smart",
+    "name": "smart",
+    "enabled": true,
+    "allowedHosts": [
+      "www.smart.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.smart.no/modeller/5"
+    ],
+    "notes": "#1, #3, #5 navigation; #5 AWD, heat pump and charging details observed."
+  },
+  {
+    "slug": "subaru",
+    "name": "Subaru",
+    "enabled": true,
+    "allowedHosts": [
+      "www.subaru.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.subaru.no/",
+      "https://www.subaru.no/biler/solterra"
+    ],
+    "notes": "Solterra, Uncharted, E-Outback; 10-year cover is service-activated, not unconditional new-car warranty."
+  },
+  {
+    "slug": "suzuki",
+    "name": "Suzuki",
+    "enabled": true,
+    "allowedHosts": [
+      "suzuki.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://suzuki.no/modeller/evitara"
+    ],
+    "notes": "e VITARA 4x4 table read; ambiguous consumption/AC units and conflicting displayed prices withheld."
+  },
+  {
+    "slug": "tesla",
+    "name": "Tesla",
+    "enabled": true,
+    "allowedHosts": [
+      "www.tesla.com"
+    ],
+    "pathPrefixes": [
+      "/no_NO"
+    ],
+    "seedUrls": [
+      "https://www.tesla.com/no_NO/support/vehicle-warranty"
+    ],
+    "notes": "Norwegian warranty table read. Model Y product page extraction still blocked/incomplete; battery capacity, pricing and current configurator specifications not obtained."
+  },
+  {
+    "slug": "toyota",
+    "name": "Toyota",
+    "enabled": true,
+    "allowedHosts": [
+      "www.toyota.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.toyota.no/nybil",
+      "https://www.toyota.no/nybil/bz4x"
+    ],
+    "notes": "Model index retrieved; full BEV-only variant extraction pending."
+  },
+  {
+    "slug": "volkswagen",
+    "name": "Volkswagen",
+    "enabled": true,
+    "allowedHosts": [
+      "www.volkswagen.no"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.volkswagen.no/no/alle-bilmodeller.html"
+    ],
+    "notes": "Norwegian starting prices observed; concepts and commercial-only vehicles excluded. New-model delivery status still requires review."
+  },
+  {
+    "slug": "volvo",
+    "name": "Volvo",
+    "enabled": true,
+    "allowedHosts": [
+      "www.volvocars.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.volvocars.com/no/",
+      "https://www.volvocars.com/no/cars/ex60-electric/"
+    ],
+    "notes": "Homepage retrieved after /cars page failed; detailed BEV extraction pending."
+  },
+  {
+    "slug": "voyah",
+    "name": "Voyah",
+    "enabled": true,
+    "allowedHosts": [
+      "www.voyah.no"
+    ],
+    "pathPrefixes": [
+      "/"
+    ],
+    "seedUrls": [
+      "https://www.voyah.no/",
+      "https://www.voyah.no/voyah-courage"
+    ],
+    "notes": "Homepage retrieved; BEV versus range-extender and passenger variants require review."
+  },
+  {
+    "slug": "xpeng",
+    "name": "XPENG",
+    "enabled": true,
+    "allowedHosts": [
+      "www.xpeng.com"
+    ],
+    "pathPrefixes": [
+      "/no"
+    ],
+    "seedUrls": [
+      "https://www.xpeng.com/no",
+      "https://www.xpeng.com/no/model/g6"
+    ],
+    "notes": "Homepage retrieved; detailed configuration and delivery status pending."
+  },
+  {
+    "slug": "zeekr",
+    "name": "Zeekr",
+    "enabled": true,
+    "allowedHosts": [
+      "www.zeekr.eu"
+    ],
+    "pathPrefixes": [
+      "/nb-no"
+    ],
+    "seedUrls": [
+      "https://www.zeekr.eu/nb-no"
+    ],
+    "notes": "001, X, 7X and 7GT BEV figures observed. Do not infer BEV status for 9X from this page."
+  }
+]

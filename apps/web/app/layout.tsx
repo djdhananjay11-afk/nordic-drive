@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import type * as React from "react";
+import Link from "next/link";
+import type { Route } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { PremiumNav } from "@/components/design-system/premium-nav";
@@ -8,7 +10,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { catalogueNotice } from "@/features/cars/data/catalogue-status";
 import { catalogueCopy } from "@/features/catalogue/copy";
 import { isCuratedRelease } from "@/features/catalogue/config";
-import { htmlLangByLocale } from "@/lib/i18n/config";
+import { htmlLangByLocale, localizePath } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getRequestLocale } from "@/lib/i18n/server";
 import { organizationJsonLd, siteConfig, websiteJsonLd } from "@/lib/seo";
@@ -54,7 +56,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <PremiumNav dictionary={dictionary.nav} locale={locale} curated={isCuratedRelease()} />
         <aside className="border-b border-amber-200 bg-amber-50 text-amber-950">
           <p className="mx-auto max-w-7xl px-5 py-3 text-sm leading-6 sm:px-8">
-            {isCuratedRelease() ? catalogueCopy[locale].notice : catalogueNotice[locale]}
+            {isCuratedRelease() ? catalogueCopy[locale].notice : catalogueNotice[locale]}{" "}
+            <Link
+              href={localizePath(locale, "/verified-cars") as Route}
+              className="inline-flex min-h-11 items-center font-semibold underline"
+            >
+              {locale === "no" ? "Se kildekontrollerte biler" : "View source-reviewed cars"}
+            </Link>
           </p>
         </aside>
         {children}

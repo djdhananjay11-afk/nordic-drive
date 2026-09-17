@@ -22,10 +22,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const [intent, results] = await Promise.all([
-    parseSearchIntent(parsed.data.query),
-    semanticVehicleSearch(parsed.data.query, parsed.data.limit ?? 5),
-  ]);
+  const intent = await parseSearchIntent(parsed.data.query);
+  const results = await semanticVehicleSearch(parsed.data.query, parsed.data.limit ?? 5, intent);
 
   return NextResponse.json(
     {

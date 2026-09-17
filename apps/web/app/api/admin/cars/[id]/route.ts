@@ -1,26 +1,35 @@
-import { apiData, apiDeleted, parseJson, requireAdminPermission } from "@/lib/admin/route-helpers";
-import { deleteAdminCar, updateAdminCar } from "@/lib/admin/services";
-import { carSchema } from "@/lib/admin/validators";
+import { z } from "zod";
+import { apiData, apiDeleted, requireAdminPermission } from "@/lib/admin/route-helpers";
+import { carSaveSchema } from "@/lib/admin/car-schema";
+import { archiveAdminCar, CarWriteError, getCarEditor, saveAdminCar } from "@/lib/admin/car-service";
+import { adminError, readEditorJson } from "@/lib/admin/http";
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function PATCH(request: Request, context: RouteContext) {
-  const authResult = await requireAdminPermission("update", "car");
-  if ("error" in authResult) return authResult.error;
-
-  const parsed = await parseJson(request, carSchema.partial());
-  if ("error" in parsed) return parsed.error;
-
-  const { id } = await context.params;
-  return apiData(await updateAdminCar(id, parsed.data));
+export const runtime = "nodejs";
+type Context = { params: Promise<{ id: string }> };
+export async function GET(_request: Request, context: Context) {
+  const result = await requireAdminPermission("read", "car");
+  if ("error" in result) return result.error;
+  try {
+    const record = await getCarEditor(z.string().uuid().parse((await context.params).id));
+    if (!record) throw new CarWriteError(404, "Car not found.");
+    return apiData(record, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) { return adminError(error); }
 }
-
-export async function DELETE(_request: Request, context: RouteContext) {
-  const authResult = await requireAdminPermission("delete", "car");
-  if ("error" in authResult) return authResult.error;
-
-  const { id } = await context.params;
-  await deleteAdminCar(id);
-
-  return apiDeleted();
+export async function PATCH(request: Request, context: Context) {
+  const result = await requireAdminPermission("update", "car");
+  if ("error" in result) return result.error;
+  try {
+    const id = z.string().uuid().parse((await context.params).id);
+    return apiData(await saveAdminCar(carSaveSchema.parse(await readEditorJson(request)), id), { headers: { "Cache-Control": "no-store" } });
+  } catch (error) { return adminError(error); }
+}
+export async function DELETE(request: Request, context: Context) {
+  const result = await requireAdminPermission("delete", "car");
+  if ("error" in result) return result.error;
+  try {
+    const id = z.string().uuid().parse((await context.params).id);
+    const input = z.object({ updatedAt: z.string().datetime() }).strict().parse(await readEditorJson(request));
+    await archiveAdminCar(id, input.updatedAt);
+    return apiDeleted();
+  } catch (error) { return adminError(error); }
 }

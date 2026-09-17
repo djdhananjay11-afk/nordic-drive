@@ -1,5 +1,7 @@
 import { createOpenAIEmbedding } from "@/features/ai/server/openai-client";
 import { getVehicleDocuments, type VehicleDocument } from "@/features/ai/server/vehicle-documents";
+import { matchesSearchConstraints } from "./search-constraints";
+import type { SearchIntent } from "./search-parser";
 
 export type SemanticSearchResult = {
   document: VehicleDocument;
@@ -9,8 +11,14 @@ export type SemanticSearchResult = {
 
 const vectorDimensions = 96;
 
-export async function semanticVehicleSearch(query: string, limit = 5): Promise<SemanticSearchResult[]> {
-  const documents = getVehicleDocuments();
+export async function semanticVehicleSearch(
+  query: string,
+  limit = 5,
+  intent?: SearchIntent,
+): Promise<SemanticSearchResult[]> {
+  const documents = getVehicleDocuments().filter(
+    (document) => !intent || matchesSearchConstraints(intent, document.car),
+  );
   const openAIEmbedding = await createOpenAIEmbedding(query);
 
   if (openAIEmbedding) {
@@ -22,7 +30,8 @@ export async function semanticVehicleSearch(query: string, limit = 5): Promise<S
   return documents
     .map((document) => {
       const documentVector = createLocalEmbedding(document.text);
-      const score = cosineSimilarity(queryVector, documentVector) * 0.72 + keywordScore(query, document) * 0.28;
+      const score =
+        cosineSimilarity(queryVector, documentVector) * 0.72 + keywordScore(query, document) * 0.28;
 
       return {
         document,
@@ -43,7 +52,9 @@ async function rankWithEmbedding(
   const embeddedDocuments = await Promise.all(
     documents.map(async (document) => ({
       document,
-      embedding: (await createOpenAIEmbedding(document.text)) ?? createLocalEmbedding(document.text, queryEmbedding.length),
+      embedding:
+        (await createOpenAIEmbedding(document.text)) ??
+        createLocalEmbedding(document.text, queryEmbedding.length),
     })),
   );
 

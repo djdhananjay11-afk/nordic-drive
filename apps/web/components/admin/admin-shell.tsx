@@ -77,7 +77,10 @@ export async function AdminShell({ children }: Readonly<{ children: React.ReactN
             </div>
           </div>
         </header>
-        <main className={cn("px-5 py-8 lg:px-8")}>{children}</main>
+        <nav aria-label="Admin sections" className="flex flex-wrap gap-1 border-b border-slate-200 bg-white px-3 py-2 lg:hidden">
+          {navItems.map(item => <Link key={item.href} href={item.href as Route} className="inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm text-slate-700 hover:bg-slate-100"><item.icon className="size-4" />{item.label}</Link>)}
+        </nav>
+        <main className={cn("min-w-0 px-4 py-8 sm:px-5 lg:px-8")}>{children}</main>
       </div>
     </div>
   );

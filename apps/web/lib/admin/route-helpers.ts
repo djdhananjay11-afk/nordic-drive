@@ -3,6 +3,7 @@ import { ZodError, type ZodSchema } from "zod";
 
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/rbac";
+import { isOwnerSession } from "@/lib/owner-policy";
 import type { PermissionAction, PermissionSubject } from "@nordicdrive/types";
 
 type JsonResponseInit = Parameters<typeof NextResponse.json>[1];
@@ -14,7 +15,7 @@ export async function requireAdminPermission(action: PermissionAction, subject: 
     return { error: NextResponse.json({ error: { code: "UNAUTHORIZED", message: "Sign in required" } }, { status: 401 }) };
   }
 
-  if (!hasPermission(session.user.role, action, subject)) {
+  if (!isOwnerSession(session) || !hasPermission(session.user.role, action, subject)) {
     return { error: NextResponse.json({ error: { code: "FORBIDDEN", message: "Insufficient permissions" } }, { status: 403 }) };
   }
 

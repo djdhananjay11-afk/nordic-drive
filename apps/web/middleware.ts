@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isCuratedRelease } from "@/features/catalogue/config";
 import { curatedRoutePolicy } from "@/features/catalogue/route-policy";
 
-import { auth } from "@/lib/auth";
-import { isAdminRole } from "@/lib/rbac";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth-config";
+import { isOwnerSession } from "@/lib/owner-policy";
 import {
   defaultLocale,
   getLocaleFromPathname,
@@ -58,9 +59,9 @@ function publicRouting(request: NextRequest) {
   });
 }
 
-const protectedRouting = auth((request) => {
+const protectedRouting = NextAuth(authConfig).auth((request) => {
   // This Auth.js beta executes custom handlers even when authorized returns false.
-  if (!isAdminRole(request.auth?.user?.role)) {
+  if (!isOwnerSession(request.auth)) {
     const path = stripLocaleFromPathname(request.nextUrl.pathname);
     if (path.startsWith("/api/") || request.auth) {
       return NextResponse.json(
