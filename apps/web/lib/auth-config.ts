@@ -2,8 +2,9 @@ import type { NextAuthConfig } from "next-auth";
 import { isOwnerEmail } from "./owner-policy";
 
 // Keep Node crypto and Prisma out of the Next.js 15 edge middleware bundle.
+const secret = process.env.AUTH_SECRET?.trim() || process.env.NEXTAUTH_SECRET?.trim();
 export const authConfig = {
-  secret: process.env.AUTH_SECRET?.trim() || process.env.NEXTAUTH_SECRET?.trim(),
+  ...(secret ? { secret } : {}),
   providers: [],
   session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
   pages: { signIn: "/login", error: "/login" },
@@ -11,7 +12,7 @@ export const authConfig = {
     session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub ?? "";
-        session.user.role = token.role ?? "user";
+        session.user.role = typeof token.role === "string" ? token.role : "user";
         session.user.ownerAuthenticated = token.ownerAuthenticated === true && isOwnerEmail(token.email);
         session.user.permissions = session.user.ownerAuthenticated ? ["manage:all"] : [];
       }

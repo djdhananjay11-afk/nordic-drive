@@ -14,7 +14,7 @@ type RecordData = { id: string; updatedAt: string; createdAt: string; car: CarEd
 const inputClass = "min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-offset-2 focus:outline-sky-700 disabled:bg-slate-100";
 const createRows = (values: Values[] = []): Row[] => values.map((value, index) => ({ key: typeof value.id === "string" ? value.id : `saved-${index}`, value }));
 
-function Fields({ fields, initial = {}, prefix, issues }: { fields: EditorField[]; initial?: Values; prefix: string; issues: Issues }) {
+function Fields({ fields, initial = {}, prefix, issues }: { fields: EditorField[]; initial?: Values | undefined; prefix: string; issues: Issues }) {
   return <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-3">{fields.map(field => {
     const name = `${prefix}${field.key}`;
     const value = initial[field.key];
@@ -31,7 +31,7 @@ function Fields({ fields, initial = {}, prefix, issues }: { fields: EditorField[
     </div>;
   })}</div>;
 }
-function Collection({ title, prefix, initial, fields, issues, dirty }: { title: string; prefix: string; initial?: Values[]; fields: EditorField[]; issues: Issues; dirty: () => void }) {
+function Collection({ title, prefix, initial, fields, issues, dirty }: { title: string; prefix: string; initial?: Values[] | undefined; fields: EditorField[]; issues: Issues; dirty: () => void }) {
   const [rows, setRows] = useState(() => createRows(initial));
   return <div className="mt-6 min-w-0">
     <div className="flex items-center justify-between gap-3"><h3 className="text-base font-semibold">{title}</h3><Button type="button" variant="outline" size="sm" onClick={() => { dirty(); setRows([...rows, { key: crypto.randomUUID(), value: { sortOrder: rows.length } }]); }}><Plus className="mr-2 size-4" />Add</Button></div>

@@ -1,5 +1,5 @@
 export type EditorField = { key: string; label: string; type?: "number" | "textarea" | "checkbox" | "url" | "json"; options?: readonly string[]; required?: boolean; step?: string };
-const field = (key: string, label: string, type?: EditorField["type"], required?: boolean): EditorField => ({ key, label, type, required });
+const field = (key: string, label: string, type?: EditorField["type"], required?: boolean): EditorField => ({ key, label, ...(type ? { type } : {}), ...(required !== undefined ? { required } : {}) });
 const choice = (key: string, label: string, options: string[]): EditorField => ({ key, label, options, required: true });
 export const carFields: EditorField[] = [
   field("name", "Model name", undefined, true), field("slug", "URL slug", undefined, true), field("displayName", "Display name"),

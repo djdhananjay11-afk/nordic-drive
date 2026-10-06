@@ -86,7 +86,7 @@ export function PremiumNav({
             size="icon"
             variant="ghost"
           >
-            <Link href="/admin">
+            <Link href="/login">
               <UserRound aria-hidden="true" className="size-5" />
             </Link>
           </Button>
@@ -122,7 +122,7 @@ export function PremiumNav({
                   );
                 })}
                 <Link
-                  href="/admin"
+                  href="/login"
                   onClick={() => setMenuOpen(false)}
                   className="flex min-h-12 items-center border-t border-slate-200 px-3 font-medium"
                 >

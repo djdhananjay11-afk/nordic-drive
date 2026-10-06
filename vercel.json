@@ -2,6 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm vercel-build",
   "framework": "nextjs",
+  "env": { "NORDICDRIVE_RELEASE_MODE": "full" },
+  "build": { "env": { "NORDICDRIVE_RELEASE_MODE": "full" } },
   "installCommand": "pnpm install",
   "regions": ["arn1"]
 }
